@@ -13,9 +13,9 @@
     </parent>
     
     <groupId>com.automapro</groupId>
-    <artifactId>automapro-backend</artifactId>
+    <artifactId>backend</artifactId>
     <version>1.0.0</version>
-    <name>AutomaPro Backend</name>
+    <name>&lt;partially loaded Maven project&gt;</name>
     <description>Sistema de gestión de licencias y distribución de software</description>
     
     <properties>
