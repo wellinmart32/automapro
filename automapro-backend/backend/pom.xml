@@ -15,12 +15,14 @@
     <groupId>com.automapro</groupId>
     <artifactId>backend</artifactId>
     <version>1.0.0</version>
-    <name>&lt;partially loaded Maven project&gt;</name>
+    <name>automapro-backend</name>
     <description>Sistema de gestión de licencias y distribución de software</description>
     
     <properties>
         <java.version>21</java.version>
         <jwt.version>0.12.3</jwt.version>
+        <!-- Clase principal de Spring Boot -->
+        <start-class>com.automapro.backend.AutomaproBackendApplication</start-class>
     </properties>
     
     <dependencies>
@@ -99,6 +101,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <mainClass>com.automapro.backend.AutomaproBackendApplication</mainClass>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
