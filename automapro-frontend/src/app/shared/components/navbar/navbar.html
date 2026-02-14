@@ -1,1 +1,100 @@
-<p>navbar works!</p>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+    <!-- Logo/Marca -->
+    <a class="navbar-brand" routerLink="/">
+      <i class="bi bi-box-seam me-2"></i>
+      AutomaPro
+    </a>
+
+    <!-- Botón toggle para móvil -->
+    <button 
+      class="navbar-toggler" 
+      type="button" 
+      data-bs-toggle="collapse" 
+      data-bs-target="#navbarNav"
+      aria-controls="navbarNav" 
+      aria-expanded="false" 
+      aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Menú de navegación -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <!-- Menú Admin -->
+        <ng-container *ngIf="estaAutenticado() && esAdmin">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/tablero" routerLinkActive="active">
+              <i class="bi bi-speedometer2 me-1"></i>
+              Tablero
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/usuarios" routerLinkActive="active">
+              <i class="bi bi-people me-1"></i>
+              Usuarios
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/aplicaciones" routerLinkActive="active">
+              <i class="bi bi-app me-1"></i>
+              Aplicaciones
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/licencias" routerLinkActive="active">
+              <i class="bi bi-key me-1"></i>
+              Licencias
+            </a>
+          </li>
+        </ng-container>
+
+        <!-- Menú Cliente -->
+        <ng-container *ngIf="estaAutenticado() && !esAdmin">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/cliente/tablero" routerLinkActive="active">
+              <i class="bi bi-speedometer2 me-1"></i>
+              Inicio
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/cliente/mis-aplicaciones" routerLinkActive="active">
+              <i class="bi bi-box-seam me-1"></i>
+              Mis Aplicaciones
+            </a>
+          </li>
+        </ng-container>
+      </ul>
+
+      <!-- Usuario y cerrar sesión -->
+      <ul class="navbar-nav" *ngIf="estaAutenticado()">
+        <li class="nav-item dropdown">
+          <a 
+            class="nav-link dropdown-toggle" 
+            href="#" 
+            id="navbarDropdown" 
+            role="button" 
+            data-bs-toggle="dropdown"
+            aria-expanded="false">
+            <i class="bi bi-person-circle me-1"></i>
+            {{ usuarioActual?.nombre }}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+            <li>
+              <span class="dropdown-item-text text-muted small">
+                {{ usuarioActual?.email }}
+              </span>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item" href="#" (click)="cerrarSesion(); $event.preventDefault()">
+                <i class="bi bi-box-arrow-right me-2"></i>
+                Cerrar Sesión
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
