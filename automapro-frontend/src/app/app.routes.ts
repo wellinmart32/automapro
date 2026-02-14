@@ -16,6 +16,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/login/login').then(m => m.Login)
   },
 
+  // Ruta de registro (pública)
+  {
+    path: 'registro',
+    loadComponent: () => import('./features/auth/registro/registro').then(m => m.Registro)
+  },
+
   // Rutas de administrador (protegidas con authGuard y adminGuard)
   {
     path: 'admin',

@@ -1,8 +1,8 @@
 <div class="container">
   <div class="row justify-content-center align-items-center min-vh-100">
-    <div class="col-12 col-md-6 col-lg-4">
+    <div class="col-12 col-md-6 col-lg-5">
       
-      <!-- Tarjeta de Login -->
+      <!-- Tarjeta de Registro -->
       <div class="card shadow">
         <div class="card-body p-4">
           
@@ -10,7 +10,13 @@
           <div class="text-center mb-4">
             <i class="bi bi-box-seam text-primary" style="font-size: 3rem;"></i>
             <h3 class="mt-2">AutomaPro</h3>
-            <p class="text-muted">Iniciar Sesión</p>
+            <p class="text-muted">Crear Cuenta</p>
+          </div>
+
+          <!-- Alerta de éxito -->
+          <div class="alert alert-success" role="alert" *ngIf="mensajeExito">
+            <i class="bi bi-check-circle me-2"></i>
+            {{ mensajeExito }}
           </div>
 
           <!-- Alerta de error -->
@@ -21,8 +27,25 @@
           </div>
 
           <!-- Formulario -->
-          <form (ngSubmit)="iniciarSesion()" #loginForm="ngForm">
+          <form (ngSubmit)="registrarse()" #registroForm="ngForm" *ngIf="!mensajeExito">
             
+            <!-- Nombre -->
+            <div class="mb-3">
+              <label for="nombre" class="form-label">
+                <i class="bi bi-person me-1"></i>
+                Nombre Completo
+              </label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="nombre" 
+                name="nombre"
+                [(ngModel)]="formulario.nombre"
+                placeholder="Ej: Juan Pérez"
+                required
+                [disabled]="cargando">
+            </div>
+
             <!-- Email -->
             <div class="mb-3">
               <label for="email" class="form-label">
@@ -34,7 +57,7 @@
                 class="form-control" 
                 id="email" 
                 name="email"
-                [(ngModel)]="solicitud.email"
+                [(ngModel)]="formulario.email"
                 placeholder="correo@ejemplo.com"
                 required
                 [disabled]="cargando">
@@ -51,34 +74,51 @@
                 class="form-control" 
                 id="password" 
                 name="password"
-                [(ngModel)]="solicitud.password"
-                placeholder="••••••••"
+                [(ngModel)]="formulario.password"
+                placeholder="Mínimo 6 caracteres"
+                required
+                [disabled]="cargando">
+            </div>
+
+            <!-- Confirmar Password -->
+            <div class="mb-3">
+              <label for="confirmarPassword" class="form-label">
+                <i class="bi bi-lock-fill me-1"></i>
+                Confirmar Contraseña
+              </label>
+              <input 
+                type="password" 
+                class="form-control" 
+                id="confirmarPassword" 
+                name="confirmarPassword"
+                [(ngModel)]="formulario.confirmarPassword"
+                placeholder="Repetir contraseña"
                 required
                 [disabled]="cargando">
             </div>
 
             <!-- Botón Submit -->
-            <div class="d-grid">
+            <div class="d-grid mb-3">
               <button 
                 type="submit" 
                 class="btn btn-primary btn-lg"
-                [disabled]="cargando || !loginForm.valid">
+                [disabled]="cargando || !registroForm.valid">
                 <span *ngIf="!cargando">
-                  <i class="bi bi-box-arrow-in-right me-2"></i>
-                  Iniciar Sesión
+                  <i class="bi bi-person-plus me-2"></i>
+                  Crear Cuenta
                 </span>
                 <span *ngIf="cargando">
                   <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                  Iniciando sesión...
+                  Registrando...
                 </span>
               </button>
             </div>
 
-            <!-- Link a Registro -->
-            <div class="text-center mt-3">
+            <!-- Link a Login -->
+            <div class="text-center">
               <p class="mb-0">
-                ¿No tienes cuenta? 
-                <a routerLink="/registro" class="text-decoration-none">Regístrate aquí</a>
+                ¿Ya tienes cuenta? 
+                <a routerLink="/login" class="text-decoration-none">Inicia sesión aquí</a>
               </p>
             </div>
 
