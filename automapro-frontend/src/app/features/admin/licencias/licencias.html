@@ -1,1 +1,250 @@
-<p>licencias works!</p>
+<div class="container-fluid py-4">
+
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="bi bi-key text-primary me-2"></i>
+                        Gestión de Licencias
+                    </h2>
+                    <p class="text-muted">Asignar y administrar licencias de aplicaciones</p>
+                </div>
+                <button class="btn btn-primary" (click)="abrirModalCrear()">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Nueva Licencia
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensajes de éxito/error -->
+    <div class="row mb-3" *ngIf="mensajeExito">
+        <div class="col-12">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle me-2"></i>
+                {{ mensajeExito }}
+                <button type="button" class="btn-close" (click)="mensajeExito = ''" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3" *ngIf="mensajeError">
+        <div class="col-12">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                {{ mensajeError }}
+                <button type="button" class="btn-close" (click)="mensajeError = ''" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spinner de carga -->
+    <div class="row" *ngIf="cargando">
+        <div class="col-12 text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="text-muted mt-2">Cargando licencias...</p>
+        </div>
+    </div>
+
+    <!-- Tabla de licencias -->
+    <div class="row" *ngIf="!cargando">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Usuario</th>
+                                    <th>Aplicación</th>
+                                    <th>Código</th>
+                                    <th>Fecha Expiración</th>
+                                    <th>Estado</th>
+                                    <th>Fecha Creación</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let licencia of licencias">
+                                    <td>{{ licencia.id }}</td>
+                                    <td>
+                                        <i class="bi bi-person-circle me-2"></i>
+                                        <div>
+                                            <strong>{{ licencia.usuarioNombre }}</strong><br>
+                                            <small class="text-muted">{{ licencia.usuarioEmail }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <i class="bi bi-box-seam me-2"></i>
+                                        <div>
+                                            <strong>{{ licencia.aplicacionNombre }}</strong><br>
+                                            <small class="text-muted">v{{ licencia.aplicacionVersion }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <code>{{ licencia.codigo }}</code>
+                                    </td>
+                                    <td>
+                                        <span *ngIf="licencia.fechaExpiracion">
+                                            {{ licencia.fechaExpiracion | date:'dd/MM/yyyy' }}
+                                        </span>
+                                        <span *ngIf="!licencia.fechaExpiracion" class="text-muted">
+                                            Permanente
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge" [ngClass]="licencia.activo ? 'bg-success' : 'bg-secondary'">
+                                            {{ licencia.activo ? 'Activa' : 'Inactiva' }}
+                                        </span>
+                                    </td>
+                                    <td>{{ licencia.fechaCreacion | date:'dd/MM/yyyy' }}</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-outline-primary me-2"
+                                            (click)="abrirModalEditar(licencia)" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger"
+                                            (click)="eliminarLicencia(licencia)" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="licencias.length === 0">
+                                    <td colspan="8" class="text-center text-muted py-4">
+                                        <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                                        <p class="mb-0 mt-2">No hay licencias registradas</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal para crear/editar licencia -->
+<div class="modal fade" [class.show]="mostrarModal" [style.display]="mostrarModal ? 'block' : 'none'" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-key me-2"></i>
+                    {{ modoEdicion ? 'Editar Licencia' : 'Nueva Licencia' }}
+                </h5>
+                <button type="button" class="btn-close" (click)="cerrarModal()" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <!-- Mensajes dentro del modal -->
+                <div class="alert alert-success" *ngIf="mensajeExito">
+                    <i class="bi bi-check-circle me-2"></i>
+                    {{ mensajeExito }}
+                </div>
+
+                <div class="alert alert-danger" *ngIf="mensajeError">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    {{ mensajeError }}
+                </div>
+
+                <!-- Formulario -->
+                <form #licenciaFormulario="ngForm">
+
+                    <!-- Usuario -->
+                    <div class="mb-3">
+                        <label for="usuarioId" class="form-label">Usuario *</label>
+                        <select class="form-select" id="usuarioId" name="usuarioId" [(ngModel)]="licenciaForm.usuarioId"
+                            required [disabled]="guardando || modoEdicion">
+                            <option [value]="0">Seleccione un usuario</option>
+                            <option *ngFor="let usuario of usuarios" [value]="usuario.id">
+                                {{ usuario.nombre }} ({{ usuario.email }})
+                            </option>
+                        </select>
+                        <div class="form-text" *ngIf="modoEdicion">
+                            No se puede cambiar el usuario de una licencia existente
+                        </div>
+                    </div>
+
+                    <!-- Aplicación -->
+                    <div class="mb-3">
+                        <label for="aplicacionId" class="form-label">Aplicación *</label>
+                        <select class="form-select" id="aplicacionId" name="aplicacionId"
+                            [(ngModel)]="licenciaForm.aplicacionId" required [disabled]="guardando || modoEdicion">
+                            <option [value]="0">Seleccione una aplicación</option>
+                            <option *ngFor="let aplicacion of aplicaciones" [value]="aplicacion.id">
+                                {{ aplicacion.nombre }} v{{ aplicacion.version }}
+                            </option>
+                        </select>
+                        <div class="form-text" *ngIf="modoEdicion">
+                            No se puede cambiar la aplicación de una licencia existente
+                        </div>
+                    </div>
+
+                    <!-- Código de Licencia -->
+                    <div class="mb-3">
+                        <label for="codigo" class="form-label">Código de Licencia *</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="codigo" name="codigo"
+                                [(ngModel)]="licenciaForm.codigo" placeholder="LIC-XXXXXXXX" required
+                                [disabled]="guardando">
+                            <button class="btn btn-outline-secondary" type="button" (click)="generarCodigo()"
+                                [disabled]="guardando">
+                                <i class="bi bi-arrow-clockwise"></i>
+                                Generar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Fecha de Expiración -->
+                    <div class="mb-3">
+                        <label for="fechaExpiracion" class="form-label">Fecha de Expiración</label>
+                        <input type="date" class="form-control" id="fechaExpiracion" name="fechaExpiracion"
+                            [ngModel]="licenciaForm.fechaExpiracion | date:'yyyy-MM-dd'"
+                            (ngModelChange)="onFechaExpiracionChange($event)" [disabled]="guardando">
+                        <div class="form-text">
+                            Dejar vacío para licencia permanente
+                        </div>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="activo" name="activo"
+                                [(ngModel)]="licenciaForm.activo" [disabled]="guardando">
+                            <label class="form-check-label" for="activo">
+                                Licencia Activa
+                            </label>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="cerrarModal()" [disabled]="guardando">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" (click)="guardarLicencia()"
+                    [disabled]="guardando || !licenciaFormulario.valid || licenciaForm.usuarioId === 0 || licenciaForm.aplicacionId === 0">
+                    <span *ngIf="!guardando">
+                        <i class="bi bi-save me-2"></i>
+                        {{ modoEdicion ? 'Actualizar' : 'Crear' }}
+                    </span>
+                    <span *ngIf="guardando">
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        Guardando...
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Backdrop del modal -->
+<div class="modal-backdrop fade" [class.show]="mostrarModal" *ngIf="mostrarModal"></div>

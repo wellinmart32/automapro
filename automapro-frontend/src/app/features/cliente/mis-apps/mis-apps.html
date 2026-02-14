@@ -1,1 +1,114 @@
-<p>mis-apps works!</p>
+<div class="container-fluid py-4">
+  
+  <!-- Encabezado -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2 class="mb-1">
+        <i class="bi bi-box-seam text-primary me-2"></i>
+        Mis Aplicaciones
+      </h2>
+      <p class="text-muted">Aplicaciones disponibles con licencia activa</p>
+    </div>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div class="row mb-3" *ngIf="mensajeError">
+    <div class="col-12">
+      <div class="alert alert-info" role="alert">
+        <i class="bi bi-info-circle me-2"></i>
+        {{ mensajeError }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Spinner de carga -->
+  <div class="row" *ngIf="cargando">
+    <div class="col-12 text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p class="text-muted mt-2">Cargando aplicaciones...</p>
+    </div>
+  </div>
+
+  <!-- Grid de aplicaciones -->
+  <div class="row g-4" *ngIf="!cargando && licencias.length > 0">
+    <div class="col-12 col-md-6 col-lg-4" *ngFor="let licencia of licencias">
+      <div class="card border-0 shadow-sm h-100">
+        
+        <!-- Imagen de la aplicación -->
+        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+          <i *ngIf="!licencia.aplicacionNombre" class="bi bi-box-seam text-muted" style="font-size: 4rem;"></i>
+          <img *ngIf="licencia.aplicacionNombre" [src]="licencia.aplicacionNombre" [alt]="licencia.aplicacionNombre" class="img-fluid">
+        </div>
+
+        <div class="card-body">
+          <!-- Nombre de la aplicación -->
+          <h5 class="card-title">
+            {{ licencia.aplicacionNombre }}
+          </h5>
+
+          <!-- Versión -->
+          <p class="text-muted mb-2">
+            <small>
+              <i class="bi bi-tag me-1"></i>
+              Versión {{ licencia.aplicacionVersion }}
+            </small>
+          </p>
+
+          <!-- Código de licencia -->
+          <div class="mb-3">
+            <small class="text-muted d-block">Código de Licencia:</small>
+            <code class="d-block">{{ licencia.codigo }}</code>
+          </div>
+
+          <!-- Estado de la licencia -->
+          <div class="mb-3">
+            <span class="badge" [ngClass]="getClaseEstado(licencia)">
+              {{ getEstadoLicencia(licencia) }}
+            </span>
+          </div>
+
+          <!-- Fecha de expiración -->
+          <p class="text-muted small mb-3" *ngIf="licencia.fechaExpiracion">
+            <i class="bi bi-calendar-event me-1"></i>
+            Expira: {{ licencia.fechaExpiracion | date:'dd/MM/yyyy' }}
+          </p>
+          <p class="text-muted small mb-3" *ngIf="!licencia.fechaExpiracion">
+            <i class="bi bi-infinity me-1"></i>
+            Licencia Permanente
+          </p>
+
+        </div>
+
+        <!-- Botón de descarga -->
+        <div class="card-footer bg-white border-0">
+          <button 
+            class="btn btn-primary w-100"
+            [disabled]="!estaVigente(licencia)"
+            (click)="descargarAplicacion(licencia)">
+            <i class="bi bi-download me-2"></i>
+            {{ estaVigente(licencia) ? 'Descargar Instalador' : 'Licencia No Vigente' }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Sin aplicaciones -->
+  <div class="row" *ngIf="!cargando && licencias.length === 0 && !mensajeError">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+          <i class="bi bi-inbox text-muted" style="font-size: 5rem;"></i>
+          <h4 class="mt-3 mb-2">No tienes aplicaciones asignadas</h4>
+          <p class="text-muted">
+            Contacta con el administrador para que te asigne licencias de aplicaciones.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

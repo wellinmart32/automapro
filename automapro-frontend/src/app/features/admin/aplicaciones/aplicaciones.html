@@ -1,1 +1,320 @@
-<p>aplicaciones works!</p>
+<div class="container-fluid py-4">
+  
+  <!-- Encabezado -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h2 class="mb-1">
+            <i class="bi bi-app text-primary me-2"></i>
+            Gestión de Aplicaciones
+          </h2>
+          <p class="text-muted">Administrar aplicaciones disponibles</p>
+        </div>
+        <button class="btn btn-primary" (click)="abrirModalCrear()">
+          <i class="bi bi-plus-circle me-2"></i>
+          Nueva Aplicación
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensajes de éxito/error -->
+  <div class="row mb-3" *ngIf="mensajeExito">
+    <div class="col-12">
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>
+        {{ mensajeExito }}
+        <button type="button" class="btn-close" (click)="mensajeExito = ''" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-3" *ngIf="mensajeError">
+    <div class="col-12">
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ mensajeError }}
+        <button type="button" class="btn-close" (click)="mensajeError = ''" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spinner de carga -->
+  <div class="row" *ngIf="cargando">
+    <div class="col-12 text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p class="text-muted mt-2">Cargando aplicaciones...</p>
+    </div>
+  </div>
+
+  <!-- Tabla de aplicaciones -->
+  <div class="row" *ngIf="!cargando">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Versión</th>
+                  <th>Descripción</th>
+                  <th>Archivo</th>
+                  <th>Estado</th>
+                  <th>Fecha Creación</th>
+                  <th class="text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let aplicacion of aplicaciones">
+                  <td>{{ aplicacion.id }}</td>
+                  <td>
+                    <i class="bi bi-box-seam me-2"></i>
+                    {{ aplicacion.nombre }}
+                  </td>
+                  <td>
+                    <span class="badge bg-secondary">v{{ aplicacion.version }}</span>
+                  </td>
+                  <td>
+                    <small>{{ aplicacion.descripcion || 'Sin descripción' }}</small>
+                  </td>
+                  <td>
+                    <span *ngIf="aplicacion.rutaArchivo" class="text-success">
+                      <i class="bi bi-check-circle"></i> Disponible
+                    </span>
+                    <span *ngIf="!aplicacion.rutaArchivo" class="text-muted">
+                      <i class="bi bi-x-circle"></i> Sin archivo
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge" [ngClass]="aplicacion.activo ? 'bg-success' : 'bg-secondary'">
+                      {{ aplicacion.activo ? 'Activo' : 'Inactivo' }}
+                    </span>
+                  </td>
+                  <td>{{ aplicacion.fechaCreacion | date:'dd/MM/yyyy' }}</td>
+                  <td class="text-center">
+                    <button 
+                      class="btn btn-sm btn-outline-success me-1" 
+                      (click)="abrirModalArchivo(aplicacion)"
+                      title="Subir instalador">
+                      <i class="bi bi-upload"></i>
+                    </button>
+                    <button 
+                      class="btn btn-sm btn-outline-primary me-1" 
+                      (click)="abrirModalEditar(aplicacion)"
+                      title="Editar">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button 
+                      class="btn btn-sm btn-outline-danger" 
+                      (click)="eliminarAplicacion(aplicacion)"
+                      title="Eliminar">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="aplicaciones.length === 0">
+                  <td colspan="8" class="text-center text-muted py-4">
+                    <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                    <p class="mb-0 mt-2">No hay aplicaciones registradas</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal para crear/editar aplicación -->
+<div class="modal fade" [class.show]="mostrarModal" [style.display]="mostrarModal ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-app me-2"></i>
+          {{ modoEdicion ? 'Editar Aplicación' : 'Nueva Aplicación' }}
+        </h5>
+        <button type="button" class="btn-close" (click)="cerrarModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        
+        <!-- Mensajes dentro del modal -->
+        <div class="alert alert-success" *ngIf="mensajeExito">
+          <i class="bi bi-check-circle me-2"></i>
+          {{ mensajeExito }}
+        </div>
+        
+        <div class="alert alert-danger" *ngIf="mensajeError">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          {{ mensajeError }}
+        </div>
+
+        <!-- Formulario -->
+        <form #aplicacionFormulario="ngForm">
+          
+          <!-- Nombre -->
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre *</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="nombre" 
+              name="nombre"
+              [(ngModel)]="aplicacionForm.nombre"
+              required
+              [disabled]="guardando">
+          </div>
+
+          <!-- Versión -->
+          <div class="mb-3">
+            <label for="version" class="form-label">Versión *</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="version" 
+              name="version"
+              [(ngModel)]="aplicacionForm.version"
+              placeholder="1.0.0"
+              required
+              [disabled]="guardando">
+          </div>
+
+          <!-- Descripción -->
+          <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea 
+              class="form-control" 
+              id="descripcion" 
+              name="descripcion"
+              [(ngModel)]="aplicacionForm.descripcion"
+              rows="3"
+              [disabled]="guardando"></textarea>
+          </div>
+
+          <!-- URL de imagen -->
+          <div class="mb-3">
+            <label for="imagenUrl" class="form-label">URL de Imagen</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="imagenUrl" 
+              name="imagenUrl"
+              [(ngModel)]="aplicacionForm.imagenUrl"
+              placeholder="https://ejemplo.com/imagen.png"
+              [disabled]="guardando">
+          </div>
+
+          <!-- Estado -->
+          <div class="mb-3">
+            <div class="form-check form-switch">
+              <input 
+                class="form-check-input" 
+                type="checkbox" 
+                id="activo" 
+                name="activo"
+                [(ngModel)]="aplicacionForm.activo"
+                [disabled]="guardando">
+              <label class="form-check-label" for="activo">
+                Aplicación Activa
+              </label>
+            </div>
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cerrarModal()" [disabled]="guardando">
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-primary" (click)="guardarAplicacion()" [disabled]="guardando || !aplicacionFormulario.valid">
+          <span *ngIf="!guardando">
+            <i class="bi bi-save me-2"></i>
+            {{ modoEdicion ? 'Actualizar' : 'Crear' }}
+          </span>
+          <span *ngIf="guardando">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Guardando...
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para subir archivo -->
+<div class="modal fade" [class.show]="mostrarModalArchivo" [style.display]="mostrarModalArchivo ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-upload me-2"></i>
+          Subir Instalador
+        </h5>
+        <button type="button" class="btn-close" (click)="cerrarModalArchivo()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        
+        <p class="text-muted">
+          <strong>Aplicación:</strong> {{ aplicacionSeleccionada?.nombre }}
+        </p>
+
+        <!-- Mensajes -->
+        <div class="alert alert-success" *ngIf="mensajeExito">
+          <i class="bi bi-check-circle me-2"></i>
+          {{ mensajeExito }}
+        </div>
+        
+        <div class="alert alert-danger" *ngIf="mensajeError">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          {{ mensajeError }}
+        </div>
+
+        <!-- Selector de archivo -->
+        <div class="mb-3">
+          <label for="archivo" class="form-label">Seleccionar archivo instalador</label>
+          <input 
+            class="form-control" 
+            type="file" 
+            id="archivo"
+            (change)="onArchivoSeleccionado($event)"
+            [disabled]="subiendoArchivo">
+          <div class="form-text">
+            Formatos soportados: .exe, .msi, .zip, .dmg, etc.
+          </div>
+        </div>
+
+        <p class="text-muted small" *ngIf="archivoSeleccionado">
+          <strong>Archivo seleccionado:</strong> {{ archivoSeleccionado.name }} 
+          ({{ (archivoSeleccionado.size / 1024 / 1024).toFixed(2) }} MB)
+        </p>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cerrarModalArchivo()" [disabled]="subiendoArchivo">
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-success" (click)="subirArchivo()" [disabled]="subiendoArchivo || !archivoSeleccionado">
+          <span *ngIf="!subiendoArchivo">
+            <i class="bi bi-cloud-upload me-2"></i>
+            Subir Archivo
+          </span>
+          <span *ngIf="subiendoArchivo">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Subiendo...
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop del modal -->
+<div class="modal-backdrop fade" [class.show]="mostrarModal || mostrarModalArchivo" *ngIf="mostrarModal || mostrarModalArchivo"></div>
