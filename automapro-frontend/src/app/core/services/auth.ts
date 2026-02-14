@@ -5,6 +5,7 @@ import { tap } from 'rxjs/operators';
 import { SolicitudLogin } from '../models/solicitud-login.model';
 import { RespuestaLogin } from '../models/respuesta-login.model';
 import { API_CONFIG } from '../config/api.config';
+import { CONSTANTES } from '../config/constantes';
 
 /**
  * Servicio para gestionar la autenticación de usuarios
@@ -14,7 +15,6 @@ import { API_CONFIG } from '../config/api.config';
 })
 export class Auth {
   private apiUrl = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.auth}`;
-  private tokenKey = 'token';
   private usuarioActualSubject = new BehaviorSubject<RespuestaLogin | null>(null);
   public usuarioActual$ = this.usuarioActualSubject.asObservable();
 
@@ -28,8 +28,8 @@ export class Auth {
   login(solicitud: SolicitudLogin): Observable<RespuestaLogin> {
     return this.http.post<RespuestaLogin>(`${this.apiUrl}/login`, solicitud).pipe(
       tap(respuesta => {
-        localStorage.setItem(this.tokenKey, respuesta.token);
-        localStorage.setItem('usuario', JSON.stringify(respuesta));
+        localStorage.setItem(CONSTANTES.STORAGE_KEYS.TOKEN, respuesta.token);
+        localStorage.setItem(CONSTANTES.STORAGE_KEYS.USUARIO, JSON.stringify(respuesta));
         this.usuarioActualSubject.next(respuesta);
       })
     );
@@ -39,8 +39,8 @@ export class Auth {
    * Cerrar sesión
    */
   logout(): void {
-    localStorage.removeItem(this.tokenKey);
-    localStorage.removeItem('usuario');
+    localStorage.removeItem(CONSTANTES.STORAGE_KEYS.TOKEN);
+    localStorage.removeItem(CONSTANTES.STORAGE_KEYS.USUARIO);
     this.usuarioActualSubject.next(null);
   }
 
@@ -48,7 +48,7 @@ export class Auth {
    * Obtener el token JWT
    */
   getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    return localStorage.getItem(CONSTANTES.STORAGE_KEYS.TOKEN);
   }
 
   /**
@@ -70,14 +70,14 @@ export class Auth {
    */
   esAdmin(): boolean {
     const usuario = this.getUsuarioActual();
-    return usuario?.rol === 'ROLE_ADMIN';
+    return usuario?.rol === CONSTANTES.ROLES.ADMIN;
   }
 
   /**
    * Cargar usuario desde localStorage al iniciar
    */
   private cargarUsuarioDesdeStorage(): void {
-    const usuarioGuardado = localStorage.getItem('usuario');
+    const usuarioGuardado = localStorage.getItem(CONSTANTES.STORAGE_KEYS.USUARIO);
     if (usuarioGuardado) {
       this.usuarioActualSubject.next(JSON.parse(usuarioGuardado));
     }
