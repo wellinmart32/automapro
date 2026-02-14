@@ -1,1 +1,91 @@
-<p>login works!</p>
+<div class="container">
+  <div class="row justify-content-center align-items-center min-vh-100">
+    <div class="col-12 col-md-6 col-lg-4">
+      
+      <!-- Tarjeta de Login -->
+      <div class="card shadow">
+        <div class="card-body p-4">
+          
+          <!-- Logo/Título -->
+          <div class="text-center mb-4">
+            <i class="bi bi-box-seam text-primary" style="font-size: 3rem;"></i>
+            <h3 class="mt-2">AutomaPro</h3>
+            <p class="text-muted">Iniciar Sesión</p>
+          </div>
+
+          <!-- Alerta de error -->
+          <div class="alert alert-danger alert-dismissible fade show" role="alert" *ngIf="mensajeError">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            {{ mensajeError }}
+            <button type="button" class="btn-close" (click)="mensajeError = ''" aria-label="Close"></button>
+          </div>
+
+          <!-- Formulario -->
+          <form (ngSubmit)="iniciarSesion()" #loginForm="ngForm">
+            
+            <!-- Email -->
+            <div class="mb-3">
+              <label for="email" class="form-label">
+                <i class="bi bi-envelope me-1"></i>
+                Correo Electrónico
+              </label>
+              <input 
+                type="email" 
+                class="form-control" 
+                id="email" 
+                name="email"
+                [(ngModel)]="solicitud.email"
+                placeholder="correo@ejemplo.com"
+                required
+                [disabled]="cargando">
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3">
+              <label for="password" class="form-label">
+                <i class="bi bi-lock me-1"></i>
+                Contraseña
+              </label>
+              <input 
+                type="password" 
+                class="form-control" 
+                id="password" 
+                name="password"
+                [(ngModel)]="solicitud.password"
+                placeholder="••••••••"
+                required
+                [disabled]="cargando">
+            </div>
+
+            <!-- Botón Submit -->
+            <div class="d-grid">
+              <button 
+                type="submit" 
+                class="btn btn-primary btn-lg"
+                [disabled]="cargando || !loginForm.valid">
+                <span *ngIf="!cargando">
+                  <i class="bi bi-box-arrow-in-right me-2"></i>
+                  Iniciar Sesión
+                </span>
+                <span *ngIf="cargando">
+                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Iniciando sesión...
+                </span>
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+      <!-- Información adicional -->
+      <div class="text-center mt-3">
+        <p class="text-muted small">
+          Sistema de Gestión de Licencias y Distribución de Software
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
