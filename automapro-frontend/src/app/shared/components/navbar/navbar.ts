@@ -33,7 +33,7 @@ export class Navbar implements OnInit {
    */
   cerrarSesion(): void {
     this.authService.logout();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/catalogo']);
   }
 
   /**
