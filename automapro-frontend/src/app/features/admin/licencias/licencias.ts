@@ -18,27 +18,33 @@ export class Licencias implements OnInit {
   licencias: Licencia[] = [];
   usuarios: Usuario[] = [];
   aplicaciones: Aplicacion[] = [];
-
+  
   licenciaSeleccionada: Licencia | null = null;
   modoEdicion = false;
-
+  
   // Formulario
   licenciaForm: Licencia = this.nuevaLicencia();
-
+  
   // Estados
   cargando = false;
   guardando = false;
   mensajeError = '';
   mensajeExito = '';
-
+  
   // Modal
   mostrarModal = false;
+
+  // Tipos de licencia disponibles
+  tiposLicencia = [
+    { value: 'TRIAL', label: 'Trial (Prueba)' },
+    { value: 'FULL', label: 'Completa' }
+  ];
 
   constructor(
     private licenciaService: LicenciaService,
     private usuarioService: UsuarioService,
     private aplicacionService: AplicacionService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.cargarDatos();
@@ -49,7 +55,7 @@ export class Licencias implements OnInit {
    */
   cargarDatos(): void {
     this.cargando = true;
-
+    
     // Cargar licencias
     this.licenciaService.listarTodas().subscribe({
       next: (licencias) => {
@@ -101,12 +107,12 @@ export class Licencias implements OnInit {
   abrirModalEditar(licencia: Licencia): void {
     this.modoEdicion = true;
     this.licenciaForm = { ...licencia };
-
+    
     // Convertir fecha de string a Date si es necesario
     if (licencia.fechaExpiracion && typeof licencia.fechaExpiracion === 'string') {
       this.licenciaForm.fechaExpiracion = new Date(licencia.fechaExpiracion);
     }
-
+    
     this.mensajeError = '';
     this.mensajeExito = '';
     this.mostrarModal = true;
@@ -191,13 +197,6 @@ export class Licencias implements OnInit {
   }
 
   /**
- * Manejar cambio de fecha de expiración
- */
-  onFechaExpiracionChange(value: any): void {
-    this.licenciaForm.fechaExpiracion = value ? new Date(value) : undefined;
-  }
-
-  /**
    * Generar código de licencia aleatorio
    */
   generarCodigo(): void {
@@ -210,6 +209,13 @@ export class Licencias implements OnInit {
   }
 
   /**
+   * Manejar cambio de fecha de expiración
+   */
+  onFechaExpiracionChange(value: any): void {
+    this.licenciaForm.fechaExpiracion = value ? new Date(value) : undefined;
+  }
+
+  /**
    * Crear objeto de licencia vacío
    */
   private nuevaLicencia(): Licencia {
@@ -217,6 +223,8 @@ export class Licencias implements OnInit {
       usuarioId: 0,
       aplicacionId: 0,
       codigo: '',
+      tipoLicencia: 'TRIAL',
+      diasTrial: 30,
       activo: true
     };
   }

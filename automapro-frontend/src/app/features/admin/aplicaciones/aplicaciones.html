@@ -63,6 +63,8 @@
                   <th>Nombre</th>
                   <th>Versión</th>
                   <th>Descripción</th>
+                  <th>Precio</th>
+                  <th>Trial</th>
                   <th>Archivo</th>
                   <th>Estado</th>
                   <th>Fecha Creación</th>
@@ -81,6 +83,12 @@
                   </td>
                   <td>
                     <small>{{ aplicacion.descripcion || 'Sin descripción' }}</small>
+                  </td>
+                  <td>
+                    <strong class="text-success">${{ aplicacion.precio || 0 }}</strong>
+                  </td>
+                  <td>
+                    <span class="badge bg-info">{{ aplicacion.diasTrial || 30 }} días</span>
                   </td>
                   <td>
                     <span *ngIf="aplicacion.rutaArchivo" class="text-success">
@@ -118,7 +126,7 @@
                   </td>
                 </tr>
                 <tr *ngIf="aplicaciones.length === 0">
-                  <td colspan="8" class="text-center text-muted py-4">
+                  <td colspan="10" class="text-center text-muted py-4">
                     <i class="bi bi-inbox" style="font-size: 3rem;"></i>
                     <p class="mb-0 mt-2">No hay aplicaciones registradas</p>
                   </td>
@@ -210,6 +218,41 @@
               [(ngModel)]="aplicacionForm.imagenUrl"
               placeholder="https://ejemplo.com/imagen.png"
               [disabled]="guardando">
+          </div>
+
+          <!-- Precio -->
+          <div class="mb-3">
+            <label for="precio" class="form-label">Precio (USD)</label>
+            <input 
+              type="number" 
+              class="form-control" 
+              id="precio" 
+              name="precio"
+              [(ngModel)]="aplicacionForm.precio"
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+              [disabled]="guardando">
+            <div class="form-text">
+              Dejar en 0 para aplicación gratuita
+            </div>
+          </div>
+
+          <!-- Días Trial -->
+          <div class="mb-3">
+            <label for="diasTrial" class="form-label">Días de Período de Prueba</label>
+            <input 
+              type="number" 
+              class="form-control" 
+              id="diasTrial" 
+              name="diasTrial"
+              [(ngModel)]="aplicacionForm.diasTrial"
+              placeholder="30"
+              min="0"
+              [disabled]="guardando">
+            <div class="form-text">
+              Días de prueba gratuita (0 = sin límite)
+            </div>
           </div>
 
           <!-- Estado -->

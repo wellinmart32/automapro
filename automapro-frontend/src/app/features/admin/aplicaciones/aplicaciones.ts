@@ -14,23 +14,23 @@ export class Aplicaciones implements OnInit {
   aplicaciones: Aplicacion[] = [];
   aplicacionSeleccionada: Aplicacion | null = null;
   modoEdicion = false;
-  
+
   // Formulario
   aplicacionForm: Aplicacion = this.nuevaAplicacion();
   archivoSeleccionado: File | null = null;
-  
+
   // Estados
   cargando = false;
   guardando = false;
   subiendoArchivo = false;
   mensajeError = '';
   mensajeExito = '';
-  
+
   // Modal
   mostrarModal = false;
   mostrarModalArchivo = false;
 
-  constructor(private aplicacionService: AplicacionService) {}
+  constructor(private aplicacionService: AplicacionService) { }
 
   ngOnInit(): void {
     this.cargarAplicaciones();
@@ -217,6 +217,8 @@ export class Aplicaciones implements OnInit {
       descripcion: '',
       version: '',
       imagenUrl: '',
+      precio: 0,
+      diasTrial: 30,
       activo: true
     };
   }
