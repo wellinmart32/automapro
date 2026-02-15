@@ -10,6 +10,7 @@ import com.automapro.backend.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -86,6 +87,8 @@ public class LicenciaService {
         licencia.setUsuario(usuario);
         licencia.setAplicacion(aplicacion);
         licencia.setCodigo(licenciaDTO.getCodigo() != null ? licenciaDTO.getCodigo() : generarCodigoLicencia());
+        licencia.setTipoLicencia(licenciaDTO.getTipoLicencia() != null ? licenciaDTO.getTipoLicencia() : "TRIAL");
+        licencia.setDiasTrial(licenciaDTO.getDiasTrial() != null ? licenciaDTO.getDiasTrial() : aplicacion.getDiasTrial());
         licencia.setFechaExpiracion(licenciaDTO.getFechaExpiracion());
         licencia.setActivo(licenciaDTO.getActivo() != null ? licenciaDTO.getActivo() : true);
 
@@ -100,6 +103,9 @@ public class LicenciaService {
         Licencia licencia = licenciaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Licencia no encontrada"));
 
+        licencia.setTipoLicencia(licenciaDTO.getTipoLicencia());
+        licencia.setFechaInicioUso(licenciaDTO.getFechaInicioUso());
+        licencia.setDiasTrial(licenciaDTO.getDiasTrial());
         licencia.setFechaExpiracion(licenciaDTO.getFechaExpiracion());
         licencia.setActivo(licenciaDTO.getActivo());
 
@@ -137,6 +143,9 @@ public class LicenciaService {
         dto.setAplicacionNombre(licencia.getAplicacion().getNombre());
         dto.setAplicacionVersion(licencia.getAplicacion().getVersion());
         dto.setCodigo(licencia.getCodigo());
+        dto.setTipoLicencia(licencia.getTipoLicencia());
+        dto.setFechaInicioUso(licencia.getFechaInicioUso());
+        dto.setDiasTrial(licencia.getDiasTrial());
         dto.setFechaExpiracion(licencia.getFechaExpiracion());
         dto.setActivo(licencia.getActivo());
         dto.setFechaCreacion(licencia.getFechaCreacion());

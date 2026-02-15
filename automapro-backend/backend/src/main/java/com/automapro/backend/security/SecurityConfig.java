@@ -45,6 +45,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configure(http)) // Habilitar CORS
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Rutas públicas (login, registro)
+                        .requestMatchers("/api/public/**").permitAll() // Rutas públicas (catálogo, verificar licencia)
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // Solo ADMIN
                         .requestMatchers("/api/cliente/**").hasAnyRole("ADMIN", "CLIENTE") // ADMIN o CLIENTE
                         .anyRequest().authenticated() // Todas las demás rutas requieren autenticación

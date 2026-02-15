@@ -34,18 +34,26 @@ public class LicenciaDTO {
     @NotBlank(message = "El código de licencia es obligatorio")
     private String codigo;
 
-    private LocalDate fechaExpiracion; // Null = licencia permanente
+    @NotBlank(message = "El tipo de licencia es obligatorio")
+    private String tipoLicencia; // TRIAL o FULL
+
+    private LocalDate fechaInicioUso; // Fecha del primer uso
+
+    private Integer diasTrial; // Días del trial
+
+    private LocalDate fechaExpiracion; // Fecha de expiración
 
     private Boolean activo;
 
     private LocalDateTime fechaCreacion;
 
     // Constructor simplificado para crear nuevas licencias
-    public LicenciaDTO(Long usuarioId, Long aplicacionId, String codigo, LocalDate fechaExpiracion, Boolean activo) {
+    public LicenciaDTO(Long usuarioId, Long aplicacionId, String codigo, String tipoLicencia, Integer diasTrial, Boolean activo) {
         this.usuarioId = usuarioId;
         this.aplicacionId = aplicacionId;
         this.codigo = codigo;
-        this.fechaExpiracion = fechaExpiracion;
+        this.tipoLicencia = tipoLicencia;
+        this.diasTrial = diasTrial;
         this.activo = activo;
     }
 }

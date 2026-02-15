@@ -32,8 +32,17 @@ public class Licencia {
     @Column(nullable = false, unique = true, length = 100)
     private String codigo; // Código único de licencia
 
+    @Column(name = "tipo_licencia", nullable = false, length = 20)
+    private String tipoLicencia; // TRIAL o FULL
+
+    @Column(name = "fecha_inicio_uso")
+    private LocalDate fechaInicioUso; // Fecha en que se usó la licencia por primera vez
+
+    @Column(name = "dias_trial")
+    private Integer diasTrial; // Cantidad de días del trial (normalmente 30)
+
     @Column(name = "fecha_expiracion")
-    private LocalDate fechaExpiracion; // Null = licencia permanente
+    private LocalDate fechaExpiracion; // Fecha de expiración (para TRIAL o licencias anuales)
 
     @Column(nullable = false)
     private Boolean activo = true;

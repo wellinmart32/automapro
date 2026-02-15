@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -32,16 +33,22 @@ public class AplicacionDTO {
 
     private String imagenUrl;
 
+    private BigDecimal precio; // Precio de la versión completa
+
+    private Integer diasTrial; // Días del período de prueba
+
     private Boolean activo;
 
     private LocalDateTime fechaCreacion;
 
     // Constructor sin ID y sin rutaArchivo (para crear nuevas aplicaciones)
-    public AplicacionDTO(String nombre, String descripcion, String version, String imagenUrl, Boolean activo) {
+    public AplicacionDTO(String nombre, String descripcion, String version, String imagenUrl, BigDecimal precio, Integer diasTrial, Boolean activo) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.version = version;
         this.imagenUrl = imagenUrl;
+        this.precio = precio;
+        this.diasTrial = diasTrial;
         this.activo = activo;
     }
 }

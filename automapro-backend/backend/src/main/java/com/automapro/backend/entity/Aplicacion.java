@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -34,6 +35,12 @@ public class Aplicacion {
 
     @Column(name = "imagen_url", length = 500)
     private String imagenUrl; // URL o ruta de la imagen de la app
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal precio; // Precio de la versión completa (null = gratis)
+
+    @Column(name = "dias_trial")
+    private Integer diasTrial; // Días de período de prueba (null = sin trial, 0 = sin límite)
 
     @Column(nullable = false)
     private Boolean activo = true;

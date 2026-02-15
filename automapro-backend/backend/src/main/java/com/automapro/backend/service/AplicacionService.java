@@ -68,6 +68,8 @@ public class AplicacionService {
         aplicacion.setDescripcion(aplicacionDTO.getDescripcion());
         aplicacion.setVersion(aplicacionDTO.getVersion());
         aplicacion.setImagenUrl(aplicacionDTO.getImagenUrl());
+        aplicacion.setPrecio(aplicacionDTO.getPrecio());
+        aplicacion.setDiasTrial(aplicacionDTO.getDiasTrial() != null ? aplicacionDTO.getDiasTrial() : 30); // Por defecto 30 días
         aplicacion.setActivo(aplicacionDTO.getActivo() != null ? aplicacionDTO.getActivo() : true);
 
         Aplicacion guardada = aplicacionRepository.save(aplicacion);
@@ -85,6 +87,8 @@ public class AplicacionService {
         aplicacion.setDescripcion(aplicacionDTO.getDescripcion());
         aplicacion.setVersion(aplicacionDTO.getVersion());
         aplicacion.setImagenUrl(aplicacionDTO.getImagenUrl());
+        aplicacion.setPrecio(aplicacionDTO.getPrecio());
+        aplicacion.setDiasTrial(aplicacionDTO.getDiasTrial());
         aplicacion.setActivo(aplicacionDTO.getActivo());
 
         Aplicacion actualizada = aplicacionRepository.save(aplicacion);
@@ -122,6 +126,8 @@ public class AplicacionService {
                 aplicacion.getVersion(),
                 aplicacion.getRutaArchivo(),
                 aplicacion.getImagenUrl(),
+                aplicacion.getPrecio(),
+                aplicacion.getDiasTrial(),
                 aplicacion.getActivo(),
                 aplicacion.getFechaCreacion()
         );
