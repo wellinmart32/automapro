@@ -1,10 +1,29 @@
-HELP.md
+# Compilación Maven
 target/
-.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### STS ###
+# Archivos de configuración de Maven
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Logs
+*.log
+logs/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# IDEs
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### Eclipse ###
 .apt_generated
 .classpath
 .factorypath
@@ -12,12 +31,6 @@ target/
 .settings
 .springBeans
 .sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
 
 ### NetBeans ###
 /nbproject/private/
@@ -31,3 +44,21 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Archivos de Spring Boot
+spring-output/
+
+# Archivos temporales
+*.tmp
+*.bak
+*.swp
+*~.nib
+
+# Archivos con claves privadas - NO SUBIR
+application-local.properties
+**/application-local.properties
+**/src/main/resources/application-local.properties
+
+# Carpeta de instaladores (archivos grandes)
+instaladores/
+**/instaladores/
