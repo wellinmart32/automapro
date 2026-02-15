@@ -1,11 +1,19 @@
 package com.automapro.backend.controller;
 
 import com.automapro.backend.dto.AplicacionDTO;
+import com.automapro.backend.dto.LicenciaDTO;
 import com.automapro.backend.entity.Licencia;
+import com.automapro.backend.entity.Usuario;
+import com.automapro.backend.entity.Aplicacion;
 import com.automapro.backend.repository.LicenciaRepository;
+import com.automapro.backend.repository.UsuarioRepository;
+import com.automapro.backend.repository.AplicacionRepository;
 import com.automapro.backend.service.AplicacionService;
+import com.automapro.backend.service.LicenciaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -28,6 +36,15 @@ public class PublicController {
     @Autowired
     private LicenciaRepository licenciaRepository;
 
+    @Autowired
+    private LicenciaService licenciaService;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private AplicacionRepository aplicacionRepository;
+
     /**
      * Obtener catálogo de aplicaciones activas (sin autenticación)
      * GET /api/public/aplicaciones
@@ -49,6 +66,56 @@ public class PublicController {
             return ResponseEntity.ok(aplicacion);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Aplicación no encontrada");
+        }
+    }
+
+    /**
+     * Generar licencia TRIAL automáticamente (requiere autenticación)
+     * POST /api/public/generar-licencia-trial/{aplicacionId}
+     */
+    @PostMapping("/generar-licencia-trial/{aplicacionId}")
+    public ResponseEntity<?> generarLicenciaTrial(@PathVariable Long aplicacionId) {
+        try {
+            // Obtener usuario autenticado
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(401).body("Usuario no autenticado");
+            }
+
+            String email = authentication.getName();
+            Usuario usuario = usuarioRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+            // Verificar que la aplicación existe
+            Aplicacion aplicacion = aplicacionRepository.findById(aplicacionId)
+                    .orElseThrow(() -> new RuntimeException("Aplicación no encontrada"));
+
+            // Verificar si el usuario ya tiene una licencia para esta aplicación
+            if (licenciaRepository.existsByUsuarioIdAndAplicacionId(usuario.getId(), aplicacionId)) {
+                return ResponseEntity.badRequest().body("Ya tienes una licencia para esta aplicación");
+            }
+
+            // Crear licencia TRIAL
+            LicenciaDTO licenciaDTO = new LicenciaDTO();
+            licenciaDTO.setUsuarioId(usuario.getId());
+            licenciaDTO.setAplicacionId(aplicacionId);
+            licenciaDTO.setTipoLicencia("TRIAL");
+            licenciaDTO.setDiasTrial(aplicacion.getDiasTrial() != null ? aplicacion.getDiasTrial() : 30);
+            licenciaDTO.setActivo(true);
+
+            // Generar código automáticamente (el servicio lo hace)
+            LicenciaDTO licenciaCreada = licenciaService.crear(licenciaDTO);
+
+            Map<String, Object> respuesta = new HashMap<>();
+            respuesta.put("mensaje", "Licencia TRIAL generada exitosamente");
+            respuesta.put("licencia", licenciaCreada);
+            respuesta.put("aplicacion", aplicacion.getNombre());
+            respuesta.put("diasTrial", licenciaCreada.getDiasTrial());
+
+            return ResponseEntity.ok(respuesta);
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al generar licencia: " + e.getMessage());
         }
     }
 

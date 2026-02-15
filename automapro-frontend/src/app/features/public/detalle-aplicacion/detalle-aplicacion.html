@@ -21,11 +21,12 @@
   </div>
 
   <!-- Mensaje de error -->
-  <div class="row" *ngIf="mensajeError">
+  <div class="row mb-3" *ngIf="mensajeError">
     <div class="col-12">
-      <div class="alert alert-danger" role="alert">
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <i class="bi bi-exclamation-triangle me-2"></i>
         {{ mensajeError }}
+        <button type="button" class="btn-close" (click)="mensajeError = ''" aria-label="Close"></button>
       </div>
     </div>
   </div>
@@ -128,8 +129,14 @@
           class="btn btn-success btn-lg"
           (click)="descargarTrial()"
           [disabled]="descargando">
-          <i class="bi bi-download me-2"></i>
-          Descargar Versión Trial ({{ aplicacion.diasTrial || 30 }} días)
+          <span *ngIf="!descargando">
+            <i class="bi bi-download me-2"></i>
+            Descargar Versión Trial ({{ aplicacion.diasTrial || 30 }} días)
+          </span>
+          <span *ngIf="descargando">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Generando licencia...
+          </span>
         </button>
 
         <!-- Botón Comprar -->
@@ -161,3 +168,102 @@
   </div>
 
 </div>
+
+<!-- Modal de Licencia Generada -->
+<div class="modal fade" [class.show]="mostrarModalLicencia" [style.display]="mostrarModalLicencia ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-check-circle me-2"></i>
+          ¡Licencia Trial Generada Exitosamente!
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="cerrarModalLicencia()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        
+        <div class="alert alert-success">
+          <h6 class="alert-heading">
+            <i class="bi bi-gift me-2"></i>
+            {{ licenciaGenerada?.mensaje }}
+          </h6>
+          <p class="mb-0">Tu licencia trial ha sido generada y está lista para usar.</p>
+        </div>
+
+        <!-- Información de la Aplicación -->
+        <div class="mb-4">
+          <h6 class="text-muted mb-2">Aplicación:</h6>
+          <h4>{{ licenciaGenerada?.aplicacion }}</h4>
+        </div>
+
+        <!-- Código de Licencia -->
+        <div class="mb-4">
+          <h6 class="text-muted mb-2">Tu Código de Licencia:</h6>
+          <div class="input-group input-group-lg">
+            <input 
+              type="text" 
+              class="form-control font-monospace" 
+              [value]="licenciaGenerada?.licencia?.codigo" 
+              readonly>
+            <button 
+              class="btn btn-outline-secondary" 
+              type="button"
+              (click)="copiarCodigo()">
+              <i class="bi bi-clipboard me-1"></i>
+              Copiar
+            </button>
+          </div>
+          <small class="text-muted">Guarda este código, lo necesitarás al instalar la aplicación</small>
+        </div>
+
+        <!-- Período de Prueba -->
+        <div class="mb-4">
+          <div class="card bg-light border-0">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  <i class="bi bi-calendar-check text-success" style="font-size: 2.5rem;"></i>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <h6 class="text-muted mb-1">Período de Prueba</h6>
+                  <h4 class="mb-0">{{ licenciaGenerada?.diasTrial }} días</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Instrucciones -->
+        <div class="alert alert-info">
+          <h6 class="alert-heading">
+            <i class="bi bi-info-circle me-2"></i>
+            Instrucciones
+          </h6>
+          <ol class="mb-0 ps-3">
+            <li>Descarga el instalador usando el botón de abajo</li>
+            <li>Ejecuta el instalador en tu computadora</li>
+            <li>Ingresa el código de licencia cuando te lo solicite</li>
+            <li>¡Disfruta de tu período de prueba de {{ licenciaGenerada?.diasTrial }} días!</li>
+          </ol>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cerrarModalLicencia()">
+          Cerrar
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-success btn-lg"
+          (click)="descargarInstalador()"
+          [disabled]="!aplicacion?.rutaArchivo">
+          <i class="bi bi-download me-2"></i>
+          Descargar Instalador
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop del modal -->
+<div class="modal-backdrop fade" [class.show]="mostrarModalLicencia" *ngIf="mostrarModalLicencia"></div>

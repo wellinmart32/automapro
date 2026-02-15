@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AplicacionService } from '../../../core/services/aplicacion';
+import { LicenciaService } from '../../../core/services/licencia';
 import { Auth } from '../../../core/services/auth';
 import { Aplicacion } from '../../../core/models/aplicacion.model';
 
 @Component({
   selector: 'app-detalle-aplicacion',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './detalle-aplicacion.html',
   styleUrl: './detalle-aplicacion.scss'
 })
@@ -16,11 +17,16 @@ export class DetalleAplicacion implements OnInit {
   cargando = false;
   mensajeError = '';
   descargando = false;
+  
+  // Modal de licencia generada
+  mostrarModalLicencia = false;
+  licenciaGenerada: any = null;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private aplicacionService: AplicacionService,
+    private licenciaService: LicenciaService,
     private authService: Auth
   ) {}
 
@@ -63,8 +69,59 @@ export class DetalleAplicacion implements OnInit {
       return;
     }
 
-    // TODO: Implementar generación de licencia TRIAL y descarga
-    alert('Generando licencia TRIAL y preparando descarga...\n(Funcionalidad en desarrollo)');
+    if (!this.aplicacion || !this.aplicacion.id) {
+      return;
+    }
+
+    this.descargando = true;
+    this.mensajeError = '';
+
+    // Generar licencia TRIAL
+    this.licenciaService.generarLicenciaTrial(this.aplicacion.id).subscribe({
+      next: (respuesta) => {
+        this.descargando = false;
+        this.licenciaGenerada = respuesta;
+        this.mostrarModalLicencia = true;
+      },
+      error: (error) => {
+        this.descargando = false;
+        console.error('Error al generar licencia:', error);
+        
+        if (error.status === 401) {
+          this.mensajeError = 'Debes iniciar sesión para descargar';
+          this.router.navigate(['/login']);
+        } else if (error.error && typeof error.error === 'string') {
+          this.mensajeError = error.error;
+        } else {
+          this.mensajeError = 'Error al generar licencia. Intenta nuevamente.';
+        }
+      }
+    });
+  }
+
+  /**
+   * Cerrar modal de licencia
+   */
+  cerrarModalLicencia(): void {
+    this.mostrarModalLicencia = false;
+    this.licenciaGenerada = null;
+  }
+
+  /**
+   * Descargar instalador
+   */
+  descargarInstalador(): void {
+    if (!this.aplicacion?.rutaArchivo) {
+      alert('El instalador no está disponible aún');
+      return;
+    }
+
+    // Construir URL de descarga
+    const nombreArchivo = this.aplicacion.rutaArchivo.split('/').pop() || '';
+    const urlDescarga = this.aplicacionService.descargarArchivo(nombreArchivo);
+    
+    // Abrir en nueva pestaña para descargar
+    window.open(urlDescarga, '_blank');
   }
 
   /**
@@ -87,6 +144,19 @@ export class DetalleAplicacion implements OnInit {
    */
   volverCatalogo(): void {
     this.router.navigate(['/catalogo']);
+  }
+
+  /**
+   * Copiar código de licencia al portapapeles
+   */
+  copiarCodigo(): void {
+    if (!this.licenciaGenerada?.licencia?.codigo) {
+      return;
+    }
+
+    navigator.clipboard.writeText(this.licenciaGenerada.licencia.codigo).then(() => {
+      alert('Código copiado al portapapeles');
+    });
   }
 
   /**

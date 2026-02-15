@@ -12,8 +12,16 @@ import { API_CONFIG } from '../config/api.config';
 })
 export class LicenciaService {
   private apiUrl = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.admin.licencias}`;
+  private apiPublicUrl = `${API_CONFIG.baseUrl}/api/public`;
 
   constructor(private http: HttpClient) {}
+
+  /**
+   * Generar licencia TRIAL automáticamente (requiere autenticación)
+   */
+  generarLicenciaTrial(aplicacionId: number): Observable<any> {
+    return this.http.post(`${this.apiPublicUrl}/generar-licencia-trial/${aplicacionId}`, {});
+  }
 
   /**
    * Listar todas las licencias
