@@ -16,6 +16,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/public/catalogo/catalogo').then(m => m.Catalogo)
   },
 
+  // Ruta de detalle de aplicación (sin autenticación)
+  {
+    path: 'aplicacion/:id',
+    loadComponent: () => import('./features/public/detalle-aplicacion/detalle-aplicacion').then(m => m.DetalleAplicacion)
+  },
+
   // Ruta de login (pública)
   {
     path: 'login',
