@@ -13,7 +13,7 @@ import { API_CONFIG } from '../config/api.config';
 export class AplicacionService {
   private apiUrl = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.admin.aplicaciones}`;
   private apiPublicUrl = `${API_CONFIG.baseUrl}/api/public`;
-  private apiArchivos = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.admin.archivos}`;
+  private apiArchivos = `${API_CONFIG.baseUrl}/api/archivos`; // CORREGIDO
 
   constructor(private http: HttpClient) {}
 

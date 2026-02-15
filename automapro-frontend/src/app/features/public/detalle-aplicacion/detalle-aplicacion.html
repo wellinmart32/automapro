@@ -34,21 +34,26 @@
   <!-- Detalle de la Aplicación -->
   <div class="row" *ngIf="!cargando && aplicacion">
     
-    <!-- Columna Izquierda - Imagen -->
+    <!-- Columna Izquierda - Icono -->
     <div class="col-12 col-lg-5 mb-4">
       <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
-          <div class="bg-light d-flex align-items-center justify-content-center" style="min-height: 400px;">
-            <img 
-              *ngIf="aplicacion.imagenUrl" 
-              [src]="aplicacion.imagenUrl" 
-              [alt]="aplicacion.nombre" 
-              class="img-fluid p-4"
-              style="max-height: 400px; max-width: 100%; object-fit: contain;">
-            <i 
-              *ngIf="!aplicacion.imagenUrl" 
-              class="bi bi-box-seam text-muted" 
-              style="font-size: 8rem;">
+          <div class="d-flex align-items-center justify-content-center bg-gradient" style="min-height: 400px;"
+               [ngClass]="{
+                 'bg-primary': aplicacion.nombre.includes('Editor'),
+                 'bg-success': aplicacion.nombre.includes('Contraseñas'),
+                 'bg-danger': aplicacion.nombre.includes('Ofimática'),
+                 'bg-warning': aplicacion.nombre.includes('Antivirus'),
+                 'bg-info': aplicacion.nombre.includes('Backup')
+               }">
+            <i class="bi text-white" style="font-size: 10rem;"
+               [ngClass]="{
+                 'bi-image': aplicacion.nombre.includes('Editor'),
+                 'bi-shield-lock': aplicacion.nombre.includes('Contraseñas'),
+                 'bi-file-earmark-text': aplicacion.nombre.includes('Ofimática'),
+                 'bi-shield-check': aplicacion.nombre.includes('Antivirus'),
+                 'bi-hdd': aplicacion.nombre.includes('Backup')
+               }">
             </i>
           </div>
         </div>

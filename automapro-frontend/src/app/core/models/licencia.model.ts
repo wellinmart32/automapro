@@ -9,6 +9,7 @@ export interface Licencia {
   aplicacionId: number;
   aplicacionNombre?: string;
   aplicacionVersion?: string;
+  aplicacionRutaArchivo?: string; // NUEVO: Ruta del instalador
   codigo: string;
   tipoLicencia: string; // TRIAL o FULL
   fechaInicioUso?: Date;

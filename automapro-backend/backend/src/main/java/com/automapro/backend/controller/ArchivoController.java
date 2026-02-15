@@ -1,8 +1,9 @@
 package com.automapro.backend.controller;
 
-import com.automapro.backend.service.ArchivoService;
+import com.automapro.backend.service.AplicacionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -10,62 +11,117 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Controlador para gestión de archivos (subida y descarga de instaladores)
  */
 @RestController
-@RequestMapping("/api/admin/archivos")
+@RequestMapping("/api/archivos")
 @CrossOrigin(origins = "${cors.origenes.permitidos}")
-@PreAuthorize("hasRole('ADMIN')")
 public class ArchivoController {
 
+    // Directorio donde se guardan los instaladores
+    private final Path directorioInstaladores = Paths.get("instaladores");
+
     @Autowired
-    private ArchivoService archivoService;
+    private AplicacionService aplicacionService;
 
     /**
-     * Subir un archivo instalador para una aplicación
-     * POST /api/admin/archivos/subir/{aplicacionId}
+     * Constructor - Crea el directorio si no existe
+     */
+    public ArchivoController() {
+        try {
+            Files.createDirectories(directorioInstaladores);
+        } catch (IOException e) {
+            throw new RuntimeException("No se pudo crear el directorio para instaladores", e);
+        }
+    }
+
+    /**
+     * Subir instalador para una aplicación (solo ADMIN)
+     * POST /api/archivos/subir/{aplicacionId}
      */
     @PostMapping("/subir/{aplicacionId}")
-    public ResponseEntity<?> subirArchivo(@PathVariable Long aplicacionId,
-                                          @RequestParam("archivo") MultipartFile archivo) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> subirArchivo(
+            @PathVariable Long aplicacionId,
+            @RequestParam("archivo") MultipartFile archivo) {
+
         try {
-            String rutaArchivo = archivoService.guardarArchivo(aplicacionId, archivo);
-            return ResponseEntity.ok("Archivo subido correctamente: " + rutaArchivo);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al subir archivo: " + e.getMessage());
+            // Validar que el archivo no esté vacío
+            if (archivo.isEmpty()) {
+                Map<String, String> error = new HashMap<>();
+                error.put("mensaje", "El archivo está vacío");
+                return ResponseEntity.badRequest().body(error);
+            }
+
+            // Generar nombre único para el archivo
+            String nombreOriginal = archivo.getOriginalFilename();
+            String extension = nombreOriginal != null && nombreOriginal.contains(".") 
+                ? nombreOriginal.substring(nombreOriginal.lastIndexOf(".")) 
+                : "";
+            String nombreArchivo = "app_" + aplicacionId + "_" + System.currentTimeMillis() + extension;
+
+            // Guardar el archivo
+            Path rutaDestino = directorioInstaladores.resolve(nombreArchivo);
+            Files.copy(archivo.getInputStream(), rutaDestino, StandardCopyOption.REPLACE_EXISTING);
+
+            // Actualizar la ruta en la base de datos
+            String rutaRelativa = "instaladores/" + nombreArchivo;
+            aplicacionService.actualizarRutaArchivo(aplicacionId, rutaRelativa);
+
+            // Crear respuesta JSON
+            Map<String, String> respuesta = new HashMap<>();
+            respuesta.put("mensaje", "Archivo subido exitosamente");
+            respuesta.put("nombreArchivo", nombreArchivo);
+            return ResponseEntity.ok(respuesta);
+
+        } catch (IOException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("mensaje", "Error al guardar el archivo: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(error);
         }
     }
 
     /**
-     * Descargar un archivo por su nombre
-     * GET /api/admin/archivos/descargar/{nombreArchivo}
+     * Descargar instalador (requiere autenticación)
+     * GET /api/archivos/descargar/{nombreArchivo}
      */
     @GetMapping("/descargar/{nombreArchivo}")
-    public ResponseEntity<?> descargarArchivo(@PathVariable String nombreArchivo) {
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
+    public ResponseEntity<Resource> descargarArchivo(@PathVariable String nombreArchivo) {
         try {
-            Resource recurso = archivoService.cargarArchivo(nombreArchivo);
+            // Construir la ruta del archivo
+            Path rutaArchivo = directorioInstaladores.resolve(nombreArchivo).normalize();
+            Resource recurso = new UrlResource(rutaArchivo.toUri());
 
+            // Verificar que el archivo existe y es legible
+            if (!recurso.exists() || !recurso.isReadable()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            // Determinar el tipo de contenido
+            String tipoContenido = Files.probeContentType(rutaArchivo);
+            if (tipoContenido == null) {
+                tipoContenido = "application/octet-stream";
+            }
+
+            // Retornar el archivo para descarga
             return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + recurso.getFilename() + "\"")
+                    .contentType(MediaType.parseMediaType(tipoContenido))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, 
+                            "attachment; filename=\"" + recurso.getFilename() + "\"")
                     .body(recurso);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al descargar archivo: " + e.getMessage());
-        }
-    }
 
-    /**
-     * Eliminar un archivo del sistema
-     * DELETE /api/admin/archivos/eliminar/{nombreArchivo}
-     */
-    @DeleteMapping("/eliminar/{nombreArchivo}")
-    public ResponseEntity<?> eliminarArchivo(@PathVariable String nombreArchivo) {
-        try {
-            archivoService.eliminarArchivo(nombreArchivo);
-            return ResponseEntity.ok("Archivo eliminado correctamente");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al eliminar archivo: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

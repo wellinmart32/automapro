@@ -30,6 +30,7 @@ public class LicenciaDTO {
 
     private String aplicacionNombre; // Para mostrar en el frontend
     private String aplicacionVersion;
+    private String aplicacionRutaArchivo; // NUEVO: Ruta del instalador
 
     @NotBlank(message = "El código de licencia es obligatorio")
     private String codigo;

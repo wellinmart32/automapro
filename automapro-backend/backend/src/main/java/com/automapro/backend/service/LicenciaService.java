@@ -142,6 +142,7 @@ public class LicenciaService {
         dto.setAplicacionId(licencia.getAplicacion().getId());
         dto.setAplicacionNombre(licencia.getAplicacion().getNombre());
         dto.setAplicacionVersion(licencia.getAplicacion().getVersion());
+        dto.setAplicacionRutaArchivo(licencia.getAplicacion().getRutaArchivo()); // NUEVO
         dto.setCodigo(licencia.getCodigo());
         dto.setTipoLicencia(licencia.getTipoLicencia());
         dto.setFechaInicioUso(licencia.getFechaInicioUso());
