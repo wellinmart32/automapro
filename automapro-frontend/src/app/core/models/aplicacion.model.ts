@@ -8,6 +8,8 @@ export interface Aplicacion {
   version: string;
   rutaArchivo?: string;
   imagenUrl?: string;
+  precio?: number;
+  diasTrial?: number;
   activo?: boolean;
   fechaCreacion?: Date;
 }

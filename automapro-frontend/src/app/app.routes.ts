@@ -3,11 +3,17 @@ import { authGuard } from './core/guards/auth-guard';
 import { adminGuard } from './core/guards/admin-guard';
 
 export const routes: Routes = [
-  // Ruta por defecto - Redirigir a login
+  // Ruta por defecto - Redirigir a catálogo público
   {
     path: '',
-    redirectTo: '/login',
+    redirectTo: '/catalogo',
     pathMatch: 'full'
+  },
+
+  // Ruta de catálogo público (sin autenticación)
+  {
+    path: 'catalogo',
+    loadComponent: () => import('./features/public/catalogo/catalogo').then(m => m.Catalogo)
   },
 
   // Ruta de login (pública)
@@ -75,6 +81,6 @@ export const routes: Routes = [
   // Ruta wildcard - Página no encontrada
   {
     path: '**',
-    redirectTo: '/login'
+    redirectTo: '/catalogo'
   }
 ];

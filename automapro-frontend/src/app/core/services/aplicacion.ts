@@ -12,9 +12,24 @@ import { API_CONFIG } from '../config/api.config';
 })
 export class AplicacionService {
   private apiUrl = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.admin.aplicaciones}`;
+  private apiPublicUrl = `${API_CONFIG.baseUrl}/api/public`;
   private apiArchivos = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.admin.archivos}`;
 
   constructor(private http: HttpClient) {}
+
+  /**
+   * Obtener catálogo público de aplicaciones (sin autenticación)
+   */
+  obtenerCatalogoPublico(): Observable<Aplicacion[]> {
+    return this.http.get<Aplicacion[]>(`${this.apiPublicUrl}/aplicaciones`);
+  }
+
+  /**
+   * Obtener detalle público de una aplicación (sin autenticación)
+   */
+  obtenerDetallePublico(id: number): Observable<Aplicacion> {
+    return this.http.get<Aplicacion>(`${this.apiPublicUrl}/aplicaciones/${id}`);
+  }
 
   /**
    * Listar todas las aplicaciones

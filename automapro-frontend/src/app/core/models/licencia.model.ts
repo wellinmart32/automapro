@@ -10,6 +10,9 @@ export interface Licencia {
   aplicacionNombre?: string;
   aplicacionVersion?: string;
   codigo: string;
+  tipoLicencia: string; // TRIAL o FULL
+  fechaInicioUso?: Date;
+  diasTrial?: number;
   fechaExpiracion?: Date;
   activo?: boolean;
   fechaCreacion?: Date;

@@ -1,0 +1,154 @@
+<div class="container-fluid">
+  
+  <!-- Hero Section -->
+  <div class="row bg-primary text-white py-5">
+    <div class="col-12 text-center">
+      <i class="bi bi-box-seam" style="font-size: 4rem;"></i>
+      <h1 class="display-4 mt-3">AutomaPro</h1>
+      <p class="lead">Distribución de Software Profesional</p>
+      <p class="mb-0">Descarga aplicaciones con licencias Trial gratuitas o adquiere la versión completa</p>
+    </div>
+  </div>
+
+  <!-- Barra de navegación alternativa para usuarios no autenticados -->
+  <div class="row bg-light border-bottom py-3">
+    <div class="col-12 d-flex justify-content-end">
+      <a routerLink="/login" class="btn btn-outline-primary me-2">
+        <i class="bi bi-box-arrow-in-right me-1"></i>
+        Iniciar Sesión
+      </a>
+      <a routerLink="/registro" class="btn btn-primary">
+        <i class="bi bi-person-plus me-1"></i>
+        Registrarse
+      </a>
+    </div>
+  </div>
+
+  <!-- Contenido Principal -->
+  <div class="container py-5">
+
+    <!-- Encabezado del Catálogo -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h2 class="mb-1">
+          <i class="bi bi-grid-3x3-gap text-primary me-2"></i>
+          Catálogo de Aplicaciones
+        </h2>
+        <p class="text-muted">Explora nuestras aplicaciones disponibles</p>
+      </div>
+    </div>
+
+    <!-- Mensaje de error -->
+    <div class="row mb-3" *ngIf="mensajeError">
+      <div class="col-12">
+        <div class="alert alert-danger" role="alert">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          {{ mensajeError }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Spinner de carga -->
+    <div class="row" *ngIf="cargando">
+      <div class="col-12 text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="text-muted mt-2">Cargando catálogo...</p>
+      </div>
+    </div>
+
+    <!-- Grid de Aplicaciones -->
+    <div class="row g-4" *ngIf="!cargando && aplicaciones.length > 0">
+      <div class="col-12 col-md-6 col-lg-4" *ngFor="let app of aplicaciones">
+        <div class="card border-0 shadow-sm h-100 hover-card">
+          
+          <!-- Imagen -->
+          <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+            <img 
+              *ngIf="app.imagenUrl" 
+              [src]="app.imagenUrl" 
+              [alt]="app.nombre" 
+              class="img-fluid"
+              style="max-height: 180px; max-width: 100%; object-fit: contain;">
+            <i 
+              *ngIf="!app.imagenUrl" 
+              class="bi bi-box-seam text-muted" 
+              style="font-size: 4rem;">
+            </i>
+          </div>
+
+          <div class="card-body d-flex flex-column">
+            <!-- Nombre -->
+            <h5 class="card-title">{{ app.nombre }}</h5>
+
+            <!-- Versión -->
+            <p class="text-muted mb-2">
+              <small>
+                <i class="bi bi-tag me-1"></i>
+                Versión {{ app.version }}
+              </small>
+            </p>
+
+            <!-- Descripción -->
+            <p class="card-text text-muted small flex-grow-1">
+              {{ app.descripcion || 'Sin descripción disponible' }}
+            </p>
+
+            <!-- Precio y Trial -->
+            <div class="mb-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <span class="badge bg-success me-2">
+                    <i class="bi bi-gift me-1"></i>
+                    Trial {{ app.diasTrial || 30 }} días
+                  </span>
+                </div>
+                <div>
+                  <strong class="text-primary">{{ formatoPrecio(app.precio) }}</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botón Ver Detalle -->
+            <button 
+              class="btn btn-primary w-100"
+              (click)="verDetalle(app.id!)">
+              <i class="bi bi-eye me-2"></i>
+              Ver Detalle
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sin aplicaciones -->
+    <div class="row" *ngIf="!cargando && aplicaciones.length === 0 && !mensajeError">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body text-center py-5">
+            <i class="bi bi-inbox text-muted" style="font-size: 5rem;"></i>
+            <h4 class="mt-3 mb-2">No hay aplicaciones disponibles</h4>
+            <p class="text-muted">
+              Vuelve pronto para ver nuevas aplicaciones.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Estilos inline para hover effect -->
+<style>
+  .hover-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+</style>
