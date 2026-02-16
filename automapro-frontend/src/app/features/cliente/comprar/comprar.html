@@ -1,0 +1,146 @@
+<div class="container py-5">
+
+  <!-- Botón Volver -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <button class="btn btn-outline-secondary" (click)="volver()">
+        <i class="bi bi-arrow-left me-2"></i>
+        Volver a Mis Aplicaciones
+      </button>
+    </div>
+  </div>
+
+  <!-- Spinner de carga -->
+  <div class="row" *ngIf="cargando">
+    <div class="col-12 text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p class="text-muted mt-2">Cargando información...</p>
+    </div>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div class="row mb-3" *ngIf="mensajeError">
+    <div class="col-12">
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ mensajeError }}
+        <button type="button" class="btn-close" (click)="mensajeError = ''" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario de Compra -->
+  <div class="row justify-content-center" *ngIf="!cargando && aplicacion">
+    <div class="col-12 col-lg-8">
+      
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">
+            <i class="bi bi-cart-check me-2"></i>
+            Comprar Versión Completa
+          </h4>
+        </div>
+        
+        <div class="card-body p-4">
+          
+          <!-- Información de la Aplicación -->
+          <div class="mb-4">
+            <h5 class="text-primary">{{ aplicacion.nombre }}</h5>
+            <p class="text-muted mb-0">Versión {{ aplicacion.version }}</p>
+          </div>
+
+          <!-- Código de Licencia -->
+          <div class="mb-4" *ngIf="codigoLicencia">
+            <h6 class="text-muted mb-2">Tu Código de Licencia:</h6>
+            <div class="input-group">
+              <input 
+                type="text" 
+                class="form-control font-monospace" 
+                [value]="codigoLicencia" 
+                readonly>
+              <span class="input-group-text">
+                <i class="bi bi-check-circle text-success"></i>
+              </span>
+            </div>
+            <small class="text-muted">
+              Esta licencia será actualizada a versión completa después del pago
+            </small>
+          </div>
+
+          <!-- Características Incluidas -->
+          <div class="mb-4">
+            <h6 class="mb-3">
+              <i class="bi bi-check-circle text-success me-2"></i>
+              Lo que incluye:
+            </h6>
+            <ul class="list-unstyled">
+              <li class="mb-2">
+                <i class="bi bi-check2 text-success me-2"></i>
+                Licencia permanente (sin expiración)
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-check2 text-success me-2"></i>
+                Todas las funciones premium desbloqueadas
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-check2 text-success me-2"></i>
+                Actualizaciones gratuitas
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-check2 text-success me-2"></i>
+                Soporte técnico prioritario
+              </li>
+            </ul>
+          </div>
+
+          <!-- Precio -->
+          <div class="mb-4">
+            <div class="card bg-light border-0">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col">
+                    <h6 class="text-muted mb-0">Total a pagar:</h6>
+                  </div>
+                  <div class="col-auto">
+                    <h3 class="mb-0 text-primary">
+                      {{ formatoPrecio(aplicacion.precio) }} USD
+                    </h3>
+                  </div>
+                </div>
+                <small class="text-muted">Pago único - Sin suscripciones</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botón de Pago -->
+          <button 
+            class="btn btn-primary btn-lg w-100"
+            (click)="iniciarPago()"
+            [disabled]="procesandoPago">
+            <span *ngIf="!procesandoPago">
+              <i class="bi bi-credit-card me-2"></i>
+              Proceder al Pago Seguro
+            </span>
+            <span *ngIf="procesandoPago">
+              <span class="spinner-border spinner-border-sm me-2"></span>
+              Redirigiendo a Stripe...
+            </span>
+          </button>
+
+          <!-- Nota de Seguridad -->
+          <div class="mt-3 text-center">
+            <small class="text-muted">
+              <i class="bi bi-shield-check me-1"></i>
+              Pago 100% seguro procesado por Stripe
+            </small>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

@@ -70,15 +70,15 @@ public class LicenciaService {
      * Crear una nueva licencia
      */
     public LicenciaDTO crear(LicenciaDTO licenciaDTO) {
-        // Verificar si el usuario existe
+        // Verificar usuario
         Usuario usuario = usuarioRepository.findById(licenciaDTO.getUsuarioId())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Verificar si la aplicación existe
+        // Verificar aplicación
         Aplicacion aplicacion = aplicacionRepository.findById(licenciaDTO.getAplicacionId())
                 .orElseThrow(() -> new RuntimeException("Aplicación no encontrada"));
 
-        // Verificar si ya existe una licencia para ese usuario y aplicación
+        // Verificar si ya existe licencia
         if (licenciaRepository.existsByUsuarioIdAndAplicacionId(licenciaDTO.getUsuarioId(), licenciaDTO.getAplicacionId())) {
             throw new RuntimeException("El usuario ya tiene una licencia para esta aplicación");
         }
@@ -124,7 +124,24 @@ public class LicenciaService {
     }
 
     /**
-     * Generar un código único de licencia
+     * Convertir licencia TRIAL a FULL después de pago exitoso
+     */
+    public void convertirAFull(Long licenciaId) {
+        Licencia licencia = licenciaRepository.findById(licenciaId)
+                .orElseThrow(() -> new RuntimeException("Licencia no encontrada"));
+        
+        // Cambiar tipo a FULL
+        licencia.setTipoLicencia("FULL");
+        // Eliminar fecha de expiración (licencia permanente)
+        licencia.setFechaExpiracion(null);
+        // Asegurar que esté activa
+        licencia.setActivo(true);
+        
+        licenciaRepository.save(licencia);
+    }
+
+    /**
+     * Generar código único de licencia
      */
     private String generarCodigoLicencia() {
         return "LIC-" + UUID.randomUUID().toString().toUpperCase().substring(0, 8);
@@ -142,7 +159,7 @@ public class LicenciaService {
         dto.setAplicacionId(licencia.getAplicacion().getId());
         dto.setAplicacionNombre(licencia.getAplicacion().getNombre());
         dto.setAplicacionVersion(licencia.getAplicacion().getVersion());
-        dto.setAplicacionRutaArchivo(licencia.getAplicacion().getRutaArchivo()); // NUEVO
+        dto.setAplicacionRutaArchivo(licencia.getAplicacion().getRutaArchivo());
         dto.setCodigo(licencia.getCodigo());
         dto.setTipoLicencia(licencia.getTipoLicencia());
         dto.setFechaInicioUso(licencia.getFechaInicioUso());

@@ -1,0 +1,53 @@
+<div class="container py-5">
+  
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      
+      <!-- Tarjeta de Cancelación -->
+      <div class="card border-0 shadow-sm">
+        
+        <!-- Icono de Cancelación -->
+        <div class="card-body text-center py-5">
+          <div class="mb-4">
+            <i class="bi bi-x-circle-fill text-warning" style="font-size: 6rem;"></i>
+          </div>
+          
+          <!-- Título -->
+          <h2 class="mb-3">Pago Cancelado</h2>
+          
+          <!-- Mensaje -->
+          <p class="lead text-muted mb-4">
+            Has cancelado el proceso de pago. No se realizó ningún cargo.
+          </p>
+          
+          <!-- Información -->
+          <div class="alert alert-info mb-4">
+            <i class="bi bi-info-circle me-2"></i>
+            Tu licencia sigue en modo Trial. Puedes intentar comprar nuevamente cuando lo desees.
+          </div>
+          
+          <!-- Botones de Acción -->
+          <div class="d-grid gap-3 d-md-flex justify-content-md-center">
+            <button 
+              class="btn btn-primary btn-lg"
+              (click)="volverAIntentar()">
+              <i class="bi bi-arrow-repeat me-2"></i>
+              Volver a Intentar
+            </button>
+            
+            <button 
+              class="btn btn-outline-secondary btn-lg"
+              (click)="irAlCatalogo()">
+              <i class="bi bi-grid-3x3-gap me-2"></i>
+              Ver Catálogo
+            </button>
+          </div>
+          
+        </div>
+        
+      </div>
+      
+    </div>
+  </div>
+  
+</div>

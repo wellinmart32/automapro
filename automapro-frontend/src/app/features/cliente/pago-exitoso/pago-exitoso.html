@@ -1,0 +1,60 @@
+<div class="container py-5">
+  
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      
+      <!-- Tarjeta de Éxito -->
+      <div class="card border-0 shadow-sm">
+        
+        <!-- Icono de Éxito -->
+        <div class="card-body text-center py-5">
+          <div class="mb-4">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 6rem;"></i>
+          </div>
+          
+          <!-- Título -->
+          <h2 class="mb-3">¡Pago Exitoso!</h2>
+          
+          <!-- Mensaje -->
+          <p class="lead text-muted mb-4">
+            Tu pago ha sido procesado correctamente.
+          </p>
+          
+          <!-- Instrucciones -->
+          <div class="alert alert-info mb-4">
+            <h5 class="alert-heading">
+              <i class="bi bi-info-circle me-2"></i>
+              Próximos pasos:
+            </h5>
+            <ol class="text-start mb-0">
+              <li class="mb-2">Tu licencia ha sido actualizada a versión completa</li>
+              <li class="mb-2">Cierra la aplicación de escritorio si está abierta</li>
+              <li class="mb-2">Vuelve a abrir la aplicación</li>
+              <li>¡Disfruta de todas las funciones premium desbloqueadas! 🎉</li>
+            </ol>
+          </div>
+          
+          <!-- Información de la Sesión -->
+          <div class="mb-4" *ngIf="sessionId">
+            <small class="text-muted">
+              <i class="bi bi-receipt me-1"></i>
+              ID de transacción: {{ sessionId }}
+            </small>
+          </div>
+          
+          <!-- Botón para ir a Mis Apps -->
+          <button 
+            class="btn btn-primary btn-lg"
+            (click)="irAMisApps()">
+            <i class="bi bi-grid-3x3-gap me-2"></i>
+            Ver Mis Aplicaciones
+          </button>
+          
+        </div>
+        
+      </div>
+      
+    </div>
+  </div>
+  
+</div>

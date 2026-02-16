@@ -77,6 +77,18 @@ export const routes: Routes = [
         loadComponent: () => import('./features/cliente/mis-apps/mis-apps').then(m => m.MisApps)
       },
       {
+        path: 'comprar',
+        loadComponent: () => import('./features/cliente/comprar/comprar').then(m => m.Comprar)
+      },
+      {
+        path: 'pago-exitoso',
+        loadComponent: () => import('./features/cliente/pago-exitoso/pago-exitoso').then(m => m.PagoExitoso)
+      },
+      {
+        path: 'pago-cancelado',
+        loadComponent: () => import('./features/cliente/pago-cancelado/pago-cancelado').then(m => m.PagoCancelado)
+      },
+      {
         path: '',
         redirectTo: 'tablero',
         pathMatch: 'full'
