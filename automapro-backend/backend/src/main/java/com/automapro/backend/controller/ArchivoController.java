@@ -1,5 +1,7 @@
 package com.automapro.backend.controller;
 
+import com.automapro.backend.entity.Aplicacion;
+import com.automapro.backend.repository.AplicacionRepository;
 import com.automapro.backend.service.AplicacionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -19,23 +21,19 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Controlador para gestión de archivos (subida y descarga de instaladores)
- */
 @RestController
 @RequestMapping("/api/archivos")
 @CrossOrigin(origins = "${cors.origenes.permitidos}")
 public class ArchivoController {
 
-    // Directorio donde se guardan los instaladores
     private final Path directorioInstaladores = Paths.get("instaladores");
 
     @Autowired
     private AplicacionService aplicacionService;
 
-    /**
-     * Constructor - Crea el directorio si no existe
-     */
+    @Autowired
+    private AplicacionRepository aplicacionRepository;
+
     public ArchivoController() {
         try {
             Files.createDirectories(directorioInstaladores);
@@ -46,7 +44,6 @@ public class ArchivoController {
 
     /**
      * Subir instalador para una aplicación (solo ADMIN)
-     * POST /api/archivos/subir/{aplicacionId}
      */
     @PostMapping("/subir/{aplicacionId}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -55,29 +52,44 @@ public class ArchivoController {
             @RequestParam("archivo") MultipartFile archivo) {
 
         try {
-            // Validar que el archivo no esté vacío
             if (archivo.isEmpty()) {
                 Map<String, String> error = new HashMap<>();
                 error.put("mensaje", "El archivo está vacío");
                 return ResponseEntity.badRequest().body(error);
             }
 
-            // Generar nombre único para el archivo
+            // Buscar aplicación
+            Aplicacion aplicacion = aplicacionRepository.findById(aplicacionId)
+                    .orElseThrow(() -> new RuntimeException("Aplicación no encontrada"));
+
+            // ELIMINAR ARCHIVO ANTERIOR si existe
+            if (aplicacion.getRutaArchivo() != null && !aplicacion.getRutaArchivo().isEmpty()) {
+                String nombreArchivoViejo = aplicacion.getRutaArchivo().replace("instaladores/", "");
+                Path rutaArchivoViejo = directorioInstaladores.resolve(nombreArchivoViejo);
+                
+                try {
+                    Files.deleteIfExists(rutaArchivoViejo);
+                    System.out.println("Archivo anterior eliminado: " + nombreArchivoViejo);
+                } catch (IOException e) {
+                    System.err.println("No se pudo eliminar archivo anterior: " + e.getMessage());
+                }
+            }
+
+            // Generar nombre único para el nuevo archivo
             String nombreOriginal = archivo.getOriginalFilename();
             String extension = nombreOriginal != null && nombreOriginal.contains(".") 
                 ? nombreOriginal.substring(nombreOriginal.lastIndexOf(".")) 
                 : "";
             String nombreArchivo = "app_" + aplicacionId + "_" + System.currentTimeMillis() + extension;
 
-            // Guardar el archivo
+            // Guardar el nuevo archivo
             Path rutaDestino = directorioInstaladores.resolve(nombreArchivo);
             Files.copy(archivo.getInputStream(), rutaDestino, StandardCopyOption.REPLACE_EXISTING);
 
-            // Actualizar la ruta en la base de datos
+            // Actualizar ruta en la BD
             String rutaRelativa = "instaladores/" + nombreArchivo;
             aplicacionService.actualizarRutaArchivo(aplicacionId, rutaRelativa);
 
-            // Crear respuesta JSON
             Map<String, String> respuesta = new HashMap<>();
             respuesta.put("mensaje", "Archivo subido exitosamente");
             respuesta.put("nombreArchivo", nombreArchivo);
@@ -91,29 +103,23 @@ public class ArchivoController {
     }
 
     /**
-     * Descargar instalador (requiere autenticación)
-     * GET /api/archivos/descargar/{nombreArchivo}
+     * Descargar instalador (público - sin autenticación)
      */
     @GetMapping("/descargar/{nombreArchivo}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
     public ResponseEntity<Resource> descargarArchivo(@PathVariable String nombreArchivo) {
         try {
-            // Construir la ruta del archivo
             Path rutaArchivo = directorioInstaladores.resolve(nombreArchivo).normalize();
             Resource recurso = new UrlResource(rutaArchivo.toUri());
 
-            // Verificar que el archivo existe y es legible
             if (!recurso.exists() || !recurso.isReadable()) {
                 return ResponseEntity.notFound().build();
             }
 
-            // Determinar el tipo de contenido
             String tipoContenido = Files.probeContentType(rutaArchivo);
             if (tipoContenido == null) {
                 tipoContenido = "application/octet-stream";
             }
 
-            // Retornar el archivo para descarga
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(tipoContenido))
                     .header(HttpHeaders.CONTENT_DISPOSITION, 

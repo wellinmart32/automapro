@@ -62,3 +62,13 @@ application-local.properties
 # Carpeta de instaladores (archivos grandes)
 instaladores/
 **/instaladores/
+*.zip
+*.exe
+*.dmg
+*.msi
+*.deb
+*.rpm
+
+# Archivos de aplicaciones subidos
+archivos-aplicaciones/
+**/archivos-aplicaciones/

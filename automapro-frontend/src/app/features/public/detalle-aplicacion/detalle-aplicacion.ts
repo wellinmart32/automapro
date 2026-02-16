@@ -31,7 +31,6 @@ export class DetalleAplicacion implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Obtener ID de la ruta
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.cargarDetalle(+id);
@@ -62,9 +61,7 @@ export class DetalleAplicacion implements OnInit {
    * Iniciar descarga (verifica autenticación y genera licencia TRIAL)
    */
   descargarTrial(): void {
-    // Verificar si está autenticado
     if (!this.authService.estaAutenticado()) {
-      // Redirigir a login
       this.router.navigate(['/login']);
       return;
     }
@@ -76,7 +73,6 @@ export class DetalleAplicacion implements OnInit {
     this.descargando = true;
     this.mensajeError = '';
 
-    // Generar licencia TRIAL
     this.licenciaService.generarLicenciaTrial(this.aplicacion.id).subscribe({
       next: (respuesta) => {
         this.descargando = false;
@@ -116,11 +112,9 @@ export class DetalleAplicacion implements OnInit {
       return;
     }
 
-    // Construir URL de descarga
     const nombreArchivo = this.aplicacion.rutaArchivo.split('/').pop() || '';
     const urlDescarga = this.aplicacionService.descargarArchivo(nombreArchivo);
     
-    // Abrir en nueva pestaña para descargar
     window.open(urlDescarga, '_blank');
   }
 
@@ -128,15 +122,21 @@ export class DetalleAplicacion implements OnInit {
    * Comprar versión completa
    */
   comprarCompleta(): void {
-    // Verificar si está autenticado
     if (!this.authService.estaAutenticado()) {
-      // Redirigir a login
       this.router.navigate(['/login']);
       return;
     }
 
-    // TODO: Implementar proceso de compra
-    alert('Proceso de compra...\n(Funcionalidad en desarrollo - integración con pasarela de pagos)');
+    if (!this.aplicacion || !this.aplicacion.id) {
+      return;
+    }
+
+    // Redirigir a la página de compra
+    this.router.navigate(['/cliente/comprar'], {
+      queryParams: {
+        app: this.aplicacion.id
+      }
+    });
   }
 
   /**

@@ -14,9 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/**
- * Configuración de seguridad de Spring Security con JWT
- */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -41,19 +38,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF (usando JWT)
-                .cors(cors -> cors.configure(http)) // Habilitar CORS
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configure(http))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // Rutas públicas (login, registro)
-                        .requestMatchers("/api/public/**").permitAll() // Rutas públicas (catálogo, verificar licencia)
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN") // Solo ADMIN
-                        .requestMatchers("/api/cliente/**").hasAnyRole("ADMIN", "CLIENTE") // ADMIN o CLIENTE
-                        .anyRequest().authenticated() // Todas las demás rutas requieren autenticación
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/public/**").permitAll()
+                        .requestMatchers("/api/archivos/descargar/**").permitAll()
+                        .requestMatchers("/api/pagos/webhook").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/cliente/**").hasAnyRole("ADMIN", "CLIENTE")
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Sin sesiones (JWT stateless)
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // Agregar el filtro JWT
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { API_CONFIG } from '../../../core/config/api.config';
 import { Licencia } from '../../../core/models/licencia.model';
@@ -17,7 +17,8 @@ export class MisApps implements OnInit {
   mensajeError = '';
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -54,13 +55,11 @@ export class MisApps implements OnInit {
       return;
     }
 
-    // Verificar si hay archivo disponible
     if (!licencia.aplicacionRutaArchivo) {
       alert(`El instalador de ${licencia.aplicacionNombre} no está disponible aún.\n\nContacta al administrador para que suba el archivo.`);
       return;
     }
 
-    // Mostrar mensaje con código de licencia
     const mensaje = `Descargando: ${licencia.aplicacionNombre}\n\n` +
       `Tu código de licencia:\n${licencia.codigo}\n\n` +
       `IMPORTANTE: Guarda este código, lo necesitarás para activar la aplicación.\n\n` +
@@ -68,47 +67,40 @@ export class MisApps implements OnInit {
 
     alert(mensaje);
 
-    // Extraer nombre del archivo de la ruta
     const nombreArchivo = this.extraerNombreArchivo(licencia.aplicacionRutaArchivo);
 
     if (nombreArchivo) {
-      // Construir URL de descarga
       const urlDescarga = `${API_CONFIG.baseUrl}/api/archivos/descargar/${nombreArchivo}`;
-
-      // Descargar mediante HttpClient (incluye token JWT automáticamente)
-      this.http.get(urlDescarga, { responseType: 'blob', observe: 'response' }).subscribe({
-        next: (response) => {
-          // Crear blob y disparar descarga
-          const blob = response.body;
-          if (blob) {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = nombreArchivo;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-          }
-        },
-        error: (error) => {
-          console.error('Error al descargar:', error);
-          alert('Error al descargar el archivo. Intenta nuevamente.');
-        }
-      });
+      
+      const link = document.createElement('a');
+      link.href = urlDescarga;
+      link.download = nombreArchivo;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } else {
       alert('Error al procesar la ruta del archivo. Contacta al administrador.');
     }
   }
 
   /**
+   * Ir a la página de compra
+   */
+  comprarVersionCompleta(licencia: Licencia): void {
+    this.router.navigate(['/cliente/comprar'], {
+      queryParams: {
+        codigo: licencia.codigo,
+        app: licencia.aplicacionId
+      }
+    });
+  }
+
+  /**
    * Extraer nombre de archivo de la ruta almacenada
-   * Ejemplo: "instaladores/app_1_123456.zip" -> "app_1_123456.zip"
    */
   private extraerNombreArchivo(ruta: string): string | null {
     if (!ruta) return null;
 
-    // Extraer solo el nombre del archivo (última parte después de /)
     const partes = ruta.split('/');
     return partes[partes.length - 1];
   }
@@ -122,7 +114,7 @@ export class MisApps implements OnInit {
     }
 
     if (!licencia.fechaExpiracion) {
-      return true; // Licencia permanente
+      return true;
     }
 
     const hoy = new Date();

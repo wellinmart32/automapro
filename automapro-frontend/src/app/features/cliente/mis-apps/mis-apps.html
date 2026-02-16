@@ -134,14 +134,24 @@
 
         </div>
 
-        <!-- Botón de descarga en el footer -->
+        <!-- Botones de acción en el footer -->
         <div class="card-footer bg-white border-0">
+          <!-- Botón Descargar -->
           <button 
-            class="btn btn-primary w-100"
+            class="btn btn-primary w-100 mb-2"
             [disabled]="!estaVigente(licencia)"
             (click)="descargarAplicacion(licencia)">
             <i class="bi bi-download me-2"></i>
             {{ estaVigente(licencia) ? 'Descargar Instalador' : 'Licencia No Vigente' }}
+          </button>
+          
+          <!-- Botón Comprar (solo si es TRIAL) -->
+          <button 
+            class="btn btn-success w-100"
+            *ngIf="licencia.tipoLicencia === 'TRIAL'"
+            (click)="comprarVersionCompleta(licencia)">
+            <i class="bi bi-cart-check me-2"></i>
+            Comprar Versión Completa
           </button>
         </div>
 

@@ -46,3 +46,16 @@ frontend/**/.DS_Store
 # Base de datos local
 **/*.db
 **/*.sqlite
+
+# Instaladores (archivos grandes) - NO SUBIR A GITHUB
+automapro-backend/backend/instaladores/
+instaladores/
+*.zip
+*.exe
+*.dmg
+*.msi
+*.deb
+*.rpm
+
+# Carpeta de respaldos (archivos originales)
+_respaldos/
