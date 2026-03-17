@@ -62,39 +62,40 @@ VALUES
 
 -- ============================================
 -- LICENCIAS DE PRUEBA
+-- Formato obligatorio: XXX-XXXXXX-XXXXX (14 chars alfanuméricos)
 -- ============================================
 
--- Licencia MASTER para Wellington (funciona en TODAS las apps)
+-- Licencia MASTER para Wellington (funciona en TODAS las apps, sin backend)
 INSERT INTO licencias (usuario_id, aplicacion_id, codigo, tipo_licencia, fecha_inicio_uso, dias_trial, fecha_expiracion, activo, fecha_creacion)
 VALUES (4, NULL, 'LIC-MASTER-WELLI', 'FULL', NOW(), NULL, NULL, true, NOW());
 
--- Licencia TRIAL para Juan (App 1)
+-- Licencia TRIAL para Juan (App 1 - Mensajes Bíblicos) - 15 días
 INSERT INTO licencias (usuario_id, aplicacion_id, codigo, tipo_licencia, fecha_inicio_uso, dias_trial, fecha_expiracion, activo, fecha_creacion)
-VALUES (2, 1, 'LIC-TRIAL001', 'TRIAL', NOW(), 15, NOW() + INTERVAL '15 days', true, NOW());
+VALUES (2, 1, 'TRL-MB0001-JUA01', 'TRIAL', NOW(), 15, NOW() + INTERVAL '15 days', true, NOW());
 
--- Licencia FULL para María (App 1)
+-- Licencia FULL para María (App 1 - Mensajes Bíblicos)
 INSERT INTO licencias (usuario_id, aplicacion_id, codigo, tipo_licencia, fecha_inicio_uso, dias_trial, fecha_expiracion, activo, fecha_creacion)
-VALUES (3, 1, 'LIC-FULL001', 'FULL', NOW(), NULL, NULL, true, NOW());
+VALUES (3, 1, 'FUL-MB0001-MAR01', 'FULL', NOW(), NULL, NULL, true, NOW());
 
--- Licencia TRIAL para Juan (App 2)
+-- Licencia TRIAL para Juan (App 2 - Marketplace) - 30 días
 INSERT INTO licencias (usuario_id, aplicacion_id, codigo, tipo_licencia, fecha_inicio_uso, dias_trial, fecha_expiracion, activo, fecha_creacion)
-VALUES (2, 2, 'LIC-TRIAL002', 'TRIAL', NOW(), 30, NOW() + INTERVAL '30 days', true, NOW());
+VALUES (2, 2, 'TRL-MK0001-JUA01', 'TRIAL', NOW(), 30, NOW() + INTERVAL '30 days', true, NOW());
 
--- Licencia FULL para María (App 2)
+-- Licencia FULL para María (App 2 - Marketplace)
 INSERT INTO licencias (usuario_id, aplicacion_id, codigo, tipo_licencia, fecha_inicio_uso, dias_trial, fecha_expiracion, activo, fecha_creacion)
-VALUES (3, 2, 'LIC-FULL002', 'FULL', NOW(), NULL, NULL, true, NOW());
+VALUES (3, 2, 'FUL-MK0001-MAR01', 'FULL', NOW(), NULL, NULL, true, NOW());
 
 -- ============================================
 -- VERIFICACIÓN
 -- ============================================
-SELECT '=== RESUMEN ===' as info;
 SELECT 'Usuarios:' as tabla, COUNT(*) as total FROM usuarios;
 SELECT 'Aplicaciones:' as tabla, COUNT(*) as total FROM aplicaciones;
 SELECT 'Licencias:' as tabla, COUNT(*) as total FROM licencias;
 
--- Mostrar todas las licencias
+-- Mostrar todas las licencias con formato
 SELECT 
     l.codigo as "Código",
+    LENGTH(REPLACE(l.codigo, '-', '')) as "Chars (debe ser 14)",
     u.nombre as "Usuario",
     COALESCE(a.nombre, '*** TODAS LAS APPS ***') as "Aplicación",
     l.tipo_licencia as "Tipo",

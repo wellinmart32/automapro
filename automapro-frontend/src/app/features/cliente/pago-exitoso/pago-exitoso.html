@@ -1,60 +1,89 @@
-<div class="container py-5">
-  
-  <div class="row justify-content-center">
-    <div class="col-12 col-lg-8">
-      
-      <!-- Tarjeta de Éxito -->
-      <div class="card border-0 shadow-sm">
-        
-        <!-- Icono de Éxito -->
-        <div class="card-body text-center py-5">
-          <div class="mb-4">
-            <i class="bi bi-check-circle-fill text-success" style="font-size: 6rem;"></i>
-          </div>
-          
-          <!-- Título -->
-          <h2 class="mb-3">¡Pago Exitoso!</h2>
-          
-          <!-- Mensaje -->
-          <p class="lead text-muted mb-4">
-            Tu pago ha sido procesado correctamente.
-          </p>
-          
-          <!-- Instrucciones -->
-          <div class="alert alert-info mb-4">
-            <h5 class="alert-heading">
-              <i class="bi bi-info-circle me-2"></i>
-              Próximos pasos:
-            </h5>
-            <ol class="text-start mb-0">
-              <li class="mb-2">Tu licencia ha sido actualizada a versión completa</li>
-              <li class="mb-2">Cierra la aplicación de escritorio si está abierta</li>
-              <li class="mb-2">Vuelve a abrir la aplicación</li>
-              <li>¡Disfruta de todas las funciones premium desbloqueadas! 🎉</li>
-            </ol>
-          </div>
-          
-          <!-- Información de la Sesión -->
-          <div class="mb-4" *ngIf="sessionId">
-            <small class="text-muted">
-              <i class="bi bi-receipt me-1"></i>
-              ID de transacción: {{ sessionId }}
-            </small>
-          </div>
-          
-          <!-- Botón para ir a Mis Apps -->
-          <button 
-            class="btn btn-primary btn-lg"
-            (click)="irAMisApps()">
-            <i class="bi bi-grid-3x3-gap me-2"></i>
-            Ver Mis Aplicaciones
-          </button>
-          
-        </div>
-        
-      </div>
-      
+<div class="container-fluid p-0">
+
+  <!-- Encabezado -->
+  <div class="row bg-success text-white py-4 mx-0">
+    <div class="col-12 text-center">
+      <i class="bi bi-check-circle-fill" style="font-size: 3rem;"></i>
+      <h1 class="mt-2 mb-0">¡Pago Exitoso!</h1>
     </div>
   </div>
-  
+
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-7">
+
+        <!-- Mensaje principal -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body text-center py-4">
+            <h4 class="mb-2">Tu compra ha sido procesada correctamente</h4>
+            <p class="text-muted mb-0">
+              Tu licencia ha sido actualizada a versión completa. Ya puedes disfrutar de todas las funciones sin límite de tiempo.
+            </p>
+          </div>
+        </div>
+
+        <!-- Próximos pasos -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title mb-3">
+              <i class="bi bi-list-check text-primary me-2"></i>
+              Próximos pasos
+            </h5>
+            <div class="alert alert-info mb-0">
+              <ol class="mb-0 ps-3">
+                <li class="mb-2">Tu licencia ha sido actualizada a versión completa</li>
+                <li class="mb-2">Cierra la aplicación de escritorio si está abierta</li>
+                <li class="mb-2">Vuelve a abrir la aplicación</li>
+                <li>¡Disfruta de todas las funciones premium desbloqueadas!</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- ID de transacción -->
+        <div class="card border-0 shadow-sm mb-4" *ngIf="sessionId">
+          <div class="card-body">
+            <h5 class="card-title mb-3">
+              <i class="bi bi-receipt text-muted me-2"></i>
+              Comprobante de pago
+            </h5>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted small">ID de transacción</span>
+              <span class="font-monospace small">{{ sessionId }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="d-grid gap-3">
+          <button class="btn btn-primary btn-lg" (click)="irAMisApps()">
+            <i class="bi bi-box-seam me-2"></i>
+            Ver Mis Aplicaciones
+          </button>
+          <a routerLink="/catalogo" class="btn btn-outline-secondary btn-lg">
+            <i class="bi bi-grid-3x3-gap me-2"></i>
+            Volver al Catálogo
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 </div>
+```
+
+---
+
+Pero necesito agregar `RouterLink` al `.ts` porque usamos `routerLink` en el HTML. Aquí el cambio:
+
+---
+
+**Nombre del archivo:**
+```
+pago-exitoso.ts
+```
+
+**Ruta completa:**
+```
+automapro-frontend/src/app/features/cliente/pago-exitoso/pago-exitoso.ts

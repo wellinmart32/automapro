@@ -76,7 +76,6 @@ public class PublicController {
     @PostMapping("/generar-licencia-trial/{aplicacionId}")
     public ResponseEntity<?> generarLicenciaTrial(@PathVariable Long aplicacionId) {
         try {
-            // Obtener usuario autenticado
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).body("Usuario no autenticado");
@@ -86,16 +85,13 @@ public class PublicController {
             Usuario usuario = usuarioRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-            // Verificar que la aplicación existe
             Aplicacion aplicacion = aplicacionRepository.findById(aplicacionId)
                     .orElseThrow(() -> new RuntimeException("Aplicación no encontrada"));
 
-            // Verificar si el usuario ya tiene una licencia para esta aplicación
             if (licenciaRepository.existsByUsuarioIdAndAplicacionId(usuario.getId(), aplicacionId)) {
                 return ResponseEntity.badRequest().body("Ya tienes una licencia para esta aplicación");
             }
 
-            // Crear licencia TRIAL
             LicenciaDTO licenciaDTO = new LicenciaDTO();
             licenciaDTO.setUsuarioId(usuario.getId());
             licenciaDTO.setAplicacionId(aplicacionId);
@@ -103,7 +99,6 @@ public class PublicController {
             licenciaDTO.setDiasTrial(aplicacion.getDiasTrial() != null ? aplicacion.getDiasTrial() : 30);
             licenciaDTO.setActivo(true);
 
-            // Generar código automáticamente (el servicio lo hace)
             LicenciaDTO licenciaCreada = licenciaService.crear(licenciaDTO);
 
             Map<String, Object> respuesta = new HashMap<>();
@@ -120,7 +115,7 @@ public class PublicController {
     }
 
     /**
-     * Verificar estado de una licencia (usado por las aplicaciones)
+     * Verificar estado de una licencia via GET (usado por las aplicaciones)
      * GET /api/public/verificar-licencia/{codigo}
      */
     @GetMapping("/verificar-licencia/{codigo}")
@@ -136,21 +131,15 @@ public class PublicController {
             respuesta.put("aplicacion", licencia.getAplicacion().getNombre());
             respuesta.put("version", licencia.getAplicacion().getVersion());
 
-            // Si es tipo TRIAL, calcular días restantes
             if ("TRIAL".equals(licencia.getTipoLicencia())) {
                 if (licencia.getFechaInicioUso() == null) {
-                    // Primera vez que se usa, registrar fecha de inicio
                     licencia.setFechaInicioUso(LocalDate.now());
-                    
-                    // Calcular fecha de expiración basada en días trial
                     if (licencia.getDiasTrial() != null && licencia.getDiasTrial() > 0) {
                         licencia.setFechaExpiracion(LocalDate.now().plusDays(licencia.getDiasTrial()));
                     }
-                    
                     licenciaRepository.save(licencia);
                 }
 
-                // Calcular días restantes
                 if (licencia.getFechaExpiracion() != null) {
                     long diasRestantes = ChronoUnit.DAYS.between(LocalDate.now(), licencia.getFechaExpiracion());
                     respuesta.put("diasRestantes", diasRestantes > 0 ? diasRestantes : 0);
@@ -173,5 +162,21 @@ public class PublicController {
             error.put("mensaje", "Licencia no válida o no encontrada");
             return ResponseEntity.badRequest().body(error);
         }
+    }
+
+    /**
+     * Verificar estado de una licencia via POST (aplicaciones desktop)
+     * POST /api/public/verificar-licencia
+     */
+    @PostMapping("/verificar-licencia")
+    public ResponseEntity<?> verificarLicenciaPost(@RequestBody Map<String, String> body) {
+        String codigo = body.getOrDefault("codigo", body.get("codigoLicencia"));
+        if (codigo == null || codigo.isBlank()) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("valida", false);
+            error.put("mensaje", "Código no proporcionado");
+            return ResponseEntity.badRequest().body(error);
+        }
+        return verificarLicencia(codigo);
     }
 }

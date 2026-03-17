@@ -1,26 +1,27 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
   <div class="container-fluid">
+
     <!-- Logo/Marca -->
     <a class="navbar-brand" routerLink="/catalogo">
-      <i class="bi bi-box-seam me-2"></i>
+      <i class="bi bi-robot me-2"></i>
       AutomaPro
     </a>
 
     <!-- Botón toggle para móvil -->
-    <button 
-      class="navbar-toggler" 
-      type="button" 
-      data-bs-toggle="collapse" 
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
       data-bs-target="#navbarNav"
-      aria-controls="navbarNav" 
-      aria-expanded="false" 
+      aria-controls="navbarNav"
+      aria-expanded="false"
       aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <!-- Menú de navegación -->
     <div class="collapse navbar-collapse" id="navbarNav">
-      
+
       <!-- Menú para usuarios NO autenticados -->
       <ul class="navbar-nav me-auto" *ngIf="!estaAutenticado()">
         <li class="nav-item">
@@ -100,13 +101,7 @@
       <!-- Usuario y cerrar sesión (autenticado) -->
       <ul class="navbar-nav" *ngIf="estaAutenticado()">
         <li class="nav-item dropdown">
-          <a 
-            class="nav-link dropdown-toggle" 
-            href="#" 
-            id="navbarDropdown" 
-            role="button" 
-            data-bs-toggle="dropdown"
-            aria-expanded="false">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="bi bi-person-circle me-1"></i>
             {{ usuarioActual?.nombre }}
           </a>
@@ -126,6 +121,7 @@
           </ul>
         </li>
       </ul>
+
     </div>
   </div>
 </nav>

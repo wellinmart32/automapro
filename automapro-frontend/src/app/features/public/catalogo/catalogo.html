@@ -64,26 +64,12 @@
         <div class="card border-0 shadow-sm h-100 hover-card">
           
           <!-- Icono de la aplicación -->
-          <div class="card-img-top bg-gradient d-flex align-items-center justify-content-center" style="height: 200px;" 
-               [ngClass]="{
-                 'bg-primary': app.nombre.includes('Editor'),
-                 'bg-success': app.nombre.includes('Contraseñas'),
-                 'bg-danger': app.nombre.includes('Ofimática'),
-                 'bg-warning': app.nombre.includes('Antivirus'),
-                 'bg-info': app.nombre.includes('Backup')
-               }">
-            <i class="bi text-white" style="font-size: 5rem;"
-               [ngClass]="{
-                 'bi-image': app.nombre.includes('Editor'),
-                 'bi-shield-lock': app.nombre.includes('Contraseñas'),
-                 'bi-file-earmark-text': app.nombre.includes('Ofimática'),
-                 'bi-shield-check': app.nombre.includes('Antivirus'),
-                 'bi-hdd': app.nombre.includes('Backup')
-               }">
-            </i>
+          <div class="card-img-top bg-primary bg-gradient d-flex align-items-center justify-content-center" style="height: 200px;">
+            <i class="bi bi-window-stack text-white" style="font-size: 5rem;"></i>
           </div>
 
           <div class="card-body d-flex flex-column">
+
             <!-- Nombre -->
             <h5 class="card-title">{{ app.nombre }}</h5>
 
@@ -143,6 +129,192 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- Sección de Beneficios -->
+  <div class="row bg-light py-5 mx-0">
+    <div class="col-12">
+      <div class="container">
+
+        <!-- Encabezado -->
+        <div class="row text-center mb-4">
+          <div class="col-12">
+            <h2 class="mb-1">¿Por qué AutomaPro?</h2>
+            <p class="text-muted">Todo lo que necesitas para automatizar sin complicaciones</p>
+          </div>
+        </div>
+
+        <!-- Tarjetas de beneficios -->
+        <div class="row g-4">
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100 text-center p-4">
+              <i class="bi bi-clock-history text-primary mb-3" style="font-size: 2.5rem;"></i>
+              <h5>Ahorra tiempo</h5>
+              <p class="text-muted small mb-0">
+                Lo que haces en horas, la app lo hace en minutos. Automatiza tareas repetitivas.
+              </p>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100 text-center p-4">
+              <i class="bi bi-graph-up-arrow text-success mb-3" style="font-size: 2.5rem;"></i>
+              <h5>Más alcance</h5>
+              <p class="text-muted small mb-0">
+                Llega a más personas sin esfuerzo adicional. Publica en múltiples canales a la vez.
+              </p>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100 text-center p-4">
+              <i class="bi bi-shield-lock text-warning mb-3" style="font-size: 2.5rem;"></i>
+              <h5>100% seguro</h5>
+              <p class="text-muted small mb-0">
+                Tus datos en tu computadora. Sin servidores externos. Sin acceso a tus cuentas.
+              </p>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100 text-center p-4">
+              <i class="bi bi-person-workspace text-info mb-3" style="font-size: 2.5rem;"></i>
+              <h5>Fácil de usar</h5>
+              <p class="text-muted small mb-0">
+                Interfaz visual intuitiva. Sin conocimientos técnicos. Configura en minutos.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección de Testimonios -->
+  <div class="container py-5">
+
+    <!-- Encabezado -->
+    <div class="row text-center mb-4">
+      <div class="col-12">
+        <h2 class="mb-1">Lo que dicen nuestros usuarios</h2>
+        <p class="text-muted">Experiencias reales de personas que automatizan con AutomaPro</p>
+      </div>
+    </div>
+
+    <!-- Tarjetas de testimonios -->
+    <div class="row g-4 justify-content-center">
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100 p-4">
+          <div class="text-warning mb-2">
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+          </div>
+          <p class="text-muted fst-italic">
+            "Antes tardaba 2 horas publicando mensajes a mano. Ahora la app lo hace sola mientras yo atiendo otras cosas."
+          </p>
+          <div class="d-flex align-items-center gap-2 mt-3">
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold"
+                 style="width: 40px; height: 40px; font-size: 0.85rem; flex-shrink: 0;">
+              MP
+            </div>
+            <div>
+              <div class="fw-semibold small">María P.</div>
+              <div class="text-muted small">Coordinadora de ministerio</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100 p-4">
+          <div class="text-warning mb-2">
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+          </div>
+          <p class="text-muted fst-italic">
+            "El trial me convenció en los primeros días. La instalación fue sencilla y el soporte respondió rápido."
+          </p>
+          <div class="d-flex align-items-center gap-2 mt-3">
+            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center fw-bold"
+                 style="width: 40px; height: 40px; font-size: 0.85rem; flex-shrink: 0;">
+              JR
+            </div>
+            <div>
+              <div class="fw-semibold small">Jorge R.</div>
+              <div class="text-muted small">Pastor independiente</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100 p-4">
+          <div class="text-warning mb-2">
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-half"></i>
+          </div>
+          <p class="text-muted fst-italic">
+            "Muy intuitivo. No necesité ayuda para configurarlo. En menos de 10 minutos ya estaba funcionando."
+          </p>
+          <div class="d-flex align-items-center gap-2 mt-3">
+            <div class="rounded-circle bg-warning text-white d-flex align-items-center justify-content-center fw-bold"
+                 style="width: 40px; height: 40px; font-size: 0.85rem; flex-shrink: 0;">
+              AL
+            </div>
+            <div>
+              <div class="fw-semibold small">Ana L.</div>
+              <div class="text-muted small">Lideresa de grupo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Llamada a la acción final -->
+  <div class="row bg-primary text-white py-5 mx-0 text-center">
+    <div class="col-12">
+      <h2 class="fw-bold mb-3">¿Listo para automatizar?</h2>
+      <p class="lead opacity-75 mb-4">Descarga gratis hoy. Sin tarjeta. Sin compromisos.</p>
+      <a href="#" class="btn btn-light btn-lg text-primary me-2">
+        <i class="bi bi-download me-2"></i>
+        Descargar trial gratis
+      </a>
+      <a routerLink="/registro" class="btn btn-outline-light btn-lg">
+        <i class="bi bi-person-plus me-2"></i>
+        Crear cuenta
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="row bg-dark text-white py-4 mx-0">
+    <div class="col-12">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-12 col-md-4 text-center text-md-start mb-3 mb-md-0">
+            <span class="fw-bold">
+              <i class="bi bi-robot me-2"></i>AutomaPro
+            </span>
+          </div>
+          <div class="col-12 col-md-4 text-center mb-3 mb-md-0">
+            <span class="text-muted small">
+              © 2025 AutomaPro. Todos los derechos reservados.
+            </span>
+          </div>
+          <div class="col-12 col-md-4 text-center text-md-end">
+            <a routerLink="/login" class="text-muted text-decoration-none me-3 small">Iniciar sesión</a>
+            <a routerLink="/registro" class="text-muted text-decoration-none small">Registrarse</a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>

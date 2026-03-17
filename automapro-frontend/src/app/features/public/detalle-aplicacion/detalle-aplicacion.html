@@ -1,264 +1,331 @@
-<div class="container py-5">
+<div class="container-fluid p-0">
 
-  <!-- Botón Volver -->
-  <div class="row mb-4">
+  <!-- Encabezado de la aplicación -->
+  <div class="row bg-primary text-white py-4 mx-0" *ngIf="!cargando && aplicacion">
     <div class="col-12">
-      <button class="btn btn-outline-secondary" (click)="volverCatalogo()">
-        <i class="bi bi-arrow-left me-2"></i>
-        Volver al Catálogo
-      </button>
-    </div>
-  </div>
-
-  <!-- Spinner de carga -->
-  <div class="row" *ngIf="cargando">
-    <div class="col-12 text-center py-5">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Cargando...</span>
-      </div>
-      <p class="text-muted mt-2">Cargando información...</p>
-    </div>
-  </div>
-
-  <!-- Mensaje de error -->
-  <div class="row mb-3" *ngIf="mensajeError">
-    <div class="col-12">
-      <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bi bi-exclamation-triangle me-2"></i>
-        {{ mensajeError }}
-        <button type="button" class="btn-close" (click)="mensajeError = ''" aria-label="Close"></button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Detalle de la Aplicación -->
-  <div class="row" *ngIf="!cargando && aplicacion">
-    
-    <!-- Columna Izquierda - Icono -->
-    <div class="col-12 col-lg-5 mb-4">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body p-0">
-          <div class="d-flex align-items-center justify-content-center bg-gradient" style="min-height: 400px;"
-               [ngClass]="{
-                 'bg-primary': aplicacion.nombre.includes('Editor'),
-                 'bg-success': aplicacion.nombre.includes('Contraseñas'),
-                 'bg-danger': aplicacion.nombre.includes('Ofimática'),
-                 'bg-warning': aplicacion.nombre.includes('Antivirus'),
-                 'bg-info': aplicacion.nombre.includes('Backup')
-               }">
-            <i class="bi text-white" style="font-size: 10rem;"
-               [ngClass]="{
-                 'bi-image': aplicacion.nombre.includes('Editor'),
-                 'bi-shield-lock': aplicacion.nombre.includes('Contraseñas'),
-                 'bi-file-earmark-text': aplicacion.nombre.includes('Ofimática'),
-                 'bi-shield-check': aplicacion.nombre.includes('Antivirus'),
-                 'bi-hdd': aplicacion.nombre.includes('Backup')
-               }">
-            </i>
+      <div class="container">
+        <button class="btn btn-outline-light btn-sm mb-3" (click)="volverCatalogo()">
+          <i class="bi bi-arrow-left me-2"></i>
+          Volver al Catálogo
+        </button>
+        <div class="d-flex align-items-center gap-3">
+          <div class="d-flex align-items-center justify-content-center bg-white bg-opacity-25 rounded-3"
+               style="width: 64px; height: 64px;">
+            <i class="bi bi-window-stack text-white" style="font-size: 2rem;"></i>
+          </div>
+          <div>
+            <h1 class="mb-1">{{ aplicacion.nombre }}</h1>
+            <p class="mb-0 opacity-75">
+              <i class="bi bi-tag me-1"></i>
+              Versión {{ aplicacion.version }}
+            </p>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Columna Derecha - Información -->
-    <div class="col-12 col-lg-7">
-      
-      <!-- Título y Versión -->
-      <div class="mb-4">
-        <h1 class="display-5 mb-2">{{ aplicacion.nombre }}</h1>
-        <p class="text-muted">
-          <i class="bi bi-tag me-1"></i>
-          Versión {{ aplicacion.version }}
-        </p>
+  <div class="container py-5">
+
+    <!-- Botón Volver (cuando no hay aplicación cargada) -->
+    <div class="row mb-4" *ngIf="!aplicacion && !cargando">
+      <div class="col-12">
+        <button class="btn btn-outline-secondary" (click)="volverCatalogo()">
+          <i class="bi bi-arrow-left me-2"></i>
+          Volver al Catálogo
+        </button>
       </div>
+    </div>
 
-      <!-- Descripción -->
-      <div class="mb-4">
-        <h5 class="mb-3">
-          <i class="bi bi-info-circle text-primary me-2"></i>
-          Descripción
-        </h5>
-        <p class="text-muted">
-          {{ aplicacion.descripcion || 'No hay descripción disponible para esta aplicación.' }}
-        </p>
+    <!-- Spinner de carga -->
+    <div class="row" *ngIf="cargando">
+      <div class="col-12 text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="text-muted mt-2">Cargando información...</p>
       </div>
+    </div>
 
-      <!-- Características -->
-      <div class="mb-4">
-        <h5 class="mb-3">
-          <i class="bi bi-check-circle text-success me-2"></i>
-          Características
-        </h5>
-        <div class="row">
-          <div class="col-12 col-md-6 mb-3">
-            <div class="card border-0 bg-light">
-              <div class="card-body">
-                <h6 class="text-muted mb-1">Período de Prueba</h6>
-                <h4 class="mb-0 text-success">
-                  <i class="bi bi-gift me-2"></i>
-                  {{ aplicacion.diasTrial || 30 }} días gratis
-                </h4>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 col-md-6 mb-3">
-            <div class="card border-0 bg-light">
-              <div class="card-body">
-                <h6 class="text-muted mb-1">Precio Versión Completa</h6>
-                <h4 class="mb-0 text-primary">
-                  <i class="bi bi-currency-dollar me-2"></i>
-                  {{ formatoPrecio(aplicacion.precio) }}
-                </h4>
-              </div>
+    <!-- Mensaje de error -->
+    <div class="row mb-3" *ngIf="mensajeError">
+      <div class="col-12">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          {{ mensajeError }}
+          <button type="button" class="btn-close" (click)="mensajeError = ''" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detalle de la Aplicación -->
+    <div class="row g-4" *ngIf="!cargando && aplicacion">
+
+      <!-- Columna Izquierda - Icono y acciones -->
+      <div class="col-12 col-lg-4">
+
+        <!-- Icono de la aplicación -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body p-0">
+            <div class="bg-primary bg-gradient d-flex align-items-center justify-content-center rounded-3"
+                 style="min-height: 260px;">
+              <i class="bi bi-window-stack text-white" style="font-size: 8rem;"></i>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Lo que incluye el Trial -->
-      <div class="alert alert-info mb-4">
-        <h6 class="alert-heading">
-          <i class="bi bi-info-circle me-2"></i>
-          Versión Trial
-        </h6>
-        <p class="mb-0 small">
-          La versión de prueba incluye funcionalidades limitadas y expira después de {{ aplicacion.diasTrial || 30 }} días.
-          Para acceder a todas las funciones, actualiza a la versión completa.
-        </p>
-      </div>
+        <!-- Tarjeta de precio y trial -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
 
-      <!-- Botones de Acción -->
-      <div class="d-grid gap-3">
-        <!-- Botón Descargar Trial -->
-        <button 
-          class="btn btn-success btn-lg"
-          (click)="descargarTrial()"
-          [disabled]="descargando">
-          <span *ngIf="!descargando">
-            <i class="bi bi-download me-2"></i>
-            Descargar Versión Trial ({{ aplicacion.diasTrial || 30 }} días)
-          </span>
-          <span *ngIf="descargando">
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            Generando licencia...
-          </span>
-        </button>
+            <!-- Trial -->
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="text-muted">
+                <i class="bi bi-gift me-2 text-success"></i>
+                Período de prueba
+              </span>
+              <span class="badge bg-success fs-6">{{ aplicacion.diasTrial || 30 }} días gratis</span>
+            </div>
 
-        <!-- Botón Comprar -->
-        <button 
-          class="btn btn-primary btn-lg"
-          (click)="comprarCompleta()"
-          *ngIf="aplicacion.precio && aplicacion.precio > 0">
-          <i class="bi bi-cart-check me-2"></i>
-          Comprar Versión Completa - {{ formatoPrecio(aplicacion.precio) }}
-        </button>
+            <!-- Precio -->
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="text-muted">
+                <i class="bi bi-currency-dollar me-2 text-primary"></i>
+                Versión completa
+              </span>
+              <strong class="text-primary fs-5">{{ formatoPrecio(aplicacion.precio) }}</strong>
+            </div>
 
-        <!-- Si es gratis -->
-        <div class="alert alert-success mb-0" *ngIf="!aplicacion.precio || aplicacion.precio === 0">
-          <i class="bi bi-gift-fill me-2"></i>
-          <strong>¡Aplicación Gratuita!</strong> Descarga sin costo adicional.
+            <!-- Versión -->
+            <div class="d-flex justify-content-between align-items-center py-2">
+              <span class="text-muted">
+                <i class="bi bi-tag me-2"></i>
+                Versión
+              </span>
+              <span>{{ aplicacion.version }}</span>
+            </div>
+
+          </div>
         </div>
+
+        <!-- Botones de acción -->
+        <div class="d-grid gap-3">
+
+          <!-- Botón Descargar Trial -->
+          <button
+            class="btn btn-success btn-lg"
+            (click)="descargarTrial()"
+            [disabled]="descargando">
+            <span *ngIf="!descargando">
+              <i class="bi bi-download me-2"></i>
+              Descargar Trial ({{ aplicacion.diasTrial || 30 }} días)
+            </span>
+            <span *ngIf="descargando">
+              <span class="spinner-border spinner-border-sm me-2"></span>
+              Generando licencia...
+            </span>
+          </button>
+
+          <!-- Botón Comprar -->
+          <button
+            class="btn btn-primary btn-lg"
+            (click)="comprarCompleta()"
+            *ngIf="aplicacion.precio && aplicacion.precio > 0">
+            <i class="bi bi-cart-check me-2"></i>
+            Comprar - {{ formatoPrecio(aplicacion.precio) }}
+          </button>
+
+          <!-- Si es gratis -->
+          <div class="alert alert-success mb-0" *ngIf="!aplicacion.precio || aplicacion.precio === 0">
+            <i class="bi bi-gift-fill me-2"></i>
+            <strong>¡Aplicación Gratuita!</strong> Descarga sin costo adicional.
+          </div>
+
+        </div>
+
       </div>
 
-      <!-- Nota de autenticación -->
-      <div class="mt-3">
-        <small class="text-muted">
-          <i class="bi bi-lock me-1"></i>
-          Se requiere iniciar sesión o registrarse para descargar
-        </small>
-      </div>
+      <!-- Columna Derecha - Información -->
+      <div class="col-12 col-lg-8">
 
+        <!-- Descripción -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title mb-3">
+              <i class="bi bi-info-circle text-primary me-2"></i>
+              Descripción
+            </h5>
+            <p class="text-muted mb-0">
+              {{ aplicacion.descripcion || 'No hay descripción disponible para esta aplicación.' }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Lo que incluye el Trial -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title mb-3">
+              <i class="bi bi-gift text-success me-2"></i>
+              Versión Trial — {{ aplicacion.diasTrial || 30 }} días gratis
+            </h5>
+            <div class="alert alert-info mb-3">
+              <i class="bi bi-info-circle me-2"></i>
+              La versión de prueba expira después de {{ aplicacion.diasTrial || 30 }} días.
+              Para acceder a todas las funciones sin límite, adquiere la versión completa.
+            </div>
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-check-circle-fill text-success"></i>
+                  <span class="small">Todas las funciones incluidas</span>
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-check-circle-fill text-success"></i>
+                  <span class="small">Descarga inmediata</span>
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-check-circle-fill text-success"></i>
+                  <span class="small">Sin tarjeta de crédito</span>
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-check-circle-fill text-success"></i>
+                  <span class="small">Soporte incluido</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lo que incluye la versión completa -->
+        <div class="card border-0 shadow-sm mb-4" *ngIf="aplicacion.precio && aplicacion.precio > 0">
+          <div class="card-body">
+            <h5 class="card-title mb-3">
+              <i class="bi bi-patch-check text-primary me-2"></i>
+              Versión Completa — {{ formatoPrecio(aplicacion.precio) }}
+            </h5>
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-check-circle-fill text-primary"></i>
+                  <span class="small">Licencia permanente sin expiración</span>
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-check-circle-fill text-primary"></i>
+                  <span class="small">Todas las funciones desbloqueadas</span>
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-check-circle-fill text-primary"></i>
+                  <span class="small">Actualizaciones gratuitas</span>
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-check-circle-fill text-primary"></i>
+                  <span class="small">Soporte prioritario</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cómo instalar -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title mb-3">
+              <i class="bi bi-laptop text-info me-2"></i>
+              ¿Cómo instalar?
+            </h5>
+            <ol class="mb-0 ps-3 text-muted small">
+              <li class="mb-2">Haz clic en "Descargar Trial" y crea una cuenta si aún no tienes una.</li>
+              <li class="mb-2">Descarga el instalador desde la ventana que aparece.</li>
+              <li class="mb-2">Ejecuta el instalador en tu computadora Windows.</li>
+              <li class="mb-2">Ingresa el código de licencia cuando la aplicación te lo solicite.</li>
+              <li>¡Listo! Disfruta tu período de prueba.</li>
+            </ol>
+          </div>
+        </div>
+
+      </div>
     </div>
 
   </div>
-
 </div>
 
 <!-- Modal de Licencia Generada -->
-<div class="modal fade" [class.show]="mostrarModalLicencia" [style.display]="mostrarModalLicencia ? 'block' : 'none'" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content">
+<div class="modal fade" [class.show]="mostrarModalLicencia" [style.display]="mostrarModalLicencia ? 'block' : 'none'"
+     tabindex="-1" role="dialog" *ngIf="mostrarModalLicencia">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+
+      <!-- Encabezado del modal -->
       <div class="modal-header bg-success text-white">
         <h5 class="modal-title">
           <i class="bi bi-check-circle me-2"></i>
-          ¡Licencia Trial Generada Exitosamente!
+          ¡Licencia generada exitosamente!
         </h5>
-        <button type="button" class="btn-close btn-close-white" (click)="cerrarModalLicencia()" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-white" (click)="cerrarModalLicencia()"></button>
       </div>
-      <div class="modal-body">
-        
-        <div class="alert alert-success">
-          <h6 class="alert-heading">
-            <i class="bi bi-gift me-2"></i>
-            {{ licenciaGenerada?.mensaje }}
-          </h6>
-          <p class="mb-0">Tu licencia trial ha sido generada y está lista para usar.</p>
-        </div>
 
-        <!-- Información de la Aplicación -->
-        <div class="mb-4">
-          <h6 class="text-muted mb-2">Aplicación:</h6>
-          <h4>{{ licenciaGenerada?.aplicacion }}</h4>
-        </div>
+      <div class="modal-body p-4">
 
-        <!-- Código de Licencia -->
+        <!-- Código de licencia -->
         <div class="mb-4">
-          <h6 class="text-muted mb-2">Tu Código de Licencia:</h6>
-          <div class="input-group input-group-lg">
-            <input 
-              type="text" 
-              class="form-control font-monospace" 
-              [value]="licenciaGenerada?.licencia?.codigo" 
+          <label class="form-label text-muted small">Tu código de licencia</label>
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control font-monospace fw-bold"
+              [value]="licenciaGenerada?.licencia?.codigo"
               readonly>
-            <button 
-              class="btn btn-outline-secondary" 
-              type="button"
-              (click)="copiarCodigo()">
-              <i class="bi bi-clipboard me-1"></i>
-              Copiar
+            <button class="btn btn-outline-secondary" (click)="copiarCodigo()">
+              <i class="bi bi-clipboard"></i>
             </button>
           </div>
-          <small class="text-muted">Guarda este código, lo necesitarás al instalar la aplicación</small>
+          <small class="text-muted">Guarda este código, lo necesitarás al instalar la aplicación.</small>
         </div>
 
-        <!-- Período de Prueba -->
-        <div class="mb-4">
-          <div class="card bg-light border-0">
-            <div class="card-body">
-              <div class="d-flex align-items-center">
-                <div class="flex-shrink-0">
-                  <i class="bi bi-calendar-check text-success" style="font-size: 2.5rem;"></i>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <h6 class="text-muted mb-1">Período de Prueba</h6>
-                  <h4 class="mb-0">{{ licenciaGenerada?.diasTrial }} días</h4>
-                </div>
-              </div>
-            </div>
-          </div>
+        <!-- Información de la licencia -->
+        <div class="alert alert-warning mb-4">
+          <i class="bi bi-clock me-2"></i>
+          Tu licencia trial es válida por <strong>{{ licenciaGenerada?.diasTrial || aplicacion?.diasTrial || 30 }} días</strong>
+          a partir de la primera vez que abras la aplicación.
         </div>
 
         <!-- Instrucciones -->
-        <div class="alert alert-info">
-          <h6 class="alert-heading">
-            <i class="bi bi-info-circle me-2"></i>
-            Instrucciones
-          </h6>
-          <ol class="mb-0 ps-3">
-            <li>Descarga el instalador usando el botón de abajo</li>
-            <li>Ejecuta el instalador en tu computadora</li>
-            <li>Ingresa el código de licencia cuando te lo solicite</li>
-            <li>¡Disfruta de tu período de prueba de {{ licenciaGenerada?.diasTrial }} días!</li>
-          </ol>
+        <div class="card border-0 bg-light">
+          <div class="card-body">
+            <h6 class="card-title">
+              <i class="bi bi-info-circle me-2"></i>
+              Instrucciones
+            </h6>
+            <ol class="mb-0 ps-3 small">
+              <li>Descarga el instalador usando el botón de abajo</li>
+              <li>Ejecuta el instalador en tu computadora</li>
+              <li>Ingresa el código de licencia cuando te lo solicite</li>
+              <li>¡Disfruta de tu período de prueba de {{ licenciaGenerada?.diasTrial || aplicacion?.diasTrial || 30 }} días!</li>
+            </ol>
+          </div>
         </div>
 
       </div>
+
+      <!-- Pie del modal -->
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="cerrarModalLicencia()">
           Cerrar
         </button>
-        <button 
-          type="button" 
+        <button
+          type="button"
           class="btn btn-success btn-lg"
           (click)="descargarInstalador()"
           [disabled]="!aplicacion?.rutaArchivo">
@@ -266,6 +333,7 @@
           Descargar Instalador
         </button>
       </div>
+
     </div>
   </div>
 </div>

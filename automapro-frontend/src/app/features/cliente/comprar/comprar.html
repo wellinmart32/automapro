@@ -34,7 +34,7 @@
   <!-- Formulario de Compra -->
   <div class="row justify-content-center" *ngIf="!cargando && aplicacion">
     <div class="col-12 col-lg-8">
-      
+
       <div class="card border-0 shadow-sm">
         <div class="card-header bg-primary text-white">
           <h4 class="mb-0">
@@ -42,9 +42,9 @@
             Comprar Versión Completa
           </h4>
         </div>
-        
+
         <div class="card-body p-4">
-          
+
           <!-- Información de la Aplicación -->
           <div class="mb-4">
             <h5 class="text-primary">{{ aplicacion.nombre }}</h5>
@@ -55,10 +55,10 @@
           <div class="mb-4" *ngIf="codigoLicencia">
             <h6 class="text-muted mb-2">Tu Código de Licencia:</h6>
             <div class="input-group">
-              <input 
-                type="text" 
-                class="form-control font-monospace" 
-                [value]="codigoLicencia" 
+              <input
+                type="text"
+                class="form-control font-monospace"
+                [value]="codigoLicencia"
                 readonly>
               <span class="input-group-text">
                 <i class="bi bi-check-circle text-success"></i>
@@ -115,7 +115,7 @@
           </div>
 
           <!-- Botón de Pago -->
-          <button 
+          <button
             class="btn btn-primary btn-lg w-100"
             (click)="iniciarPago()"
             [disabled]="procesandoPago">
@@ -125,7 +125,7 @@
             </span>
             <span *ngIf="procesandoPago">
               <span class="spinner-border spinner-border-sm me-2"></span>
-              Redirigiendo a Stripe...
+              Redirigiendo al pago...
             </span>
           </button>
 
@@ -133,7 +133,7 @@
           <div class="mt-3 text-center">
             <small class="text-muted">
               <i class="bi bi-shield-check me-1"></i>
-              Pago 100% seguro procesado por Stripe
+              Pago 100% seguro procesado por Lemon Squeezy
             </small>
           </div>
 

@@ -25,8 +25,11 @@ public interface LicenciaRepository extends JpaRepository<Licencia, Long> {
     // Verificar si existe una licencia para usuario y aplicación
     boolean existsByUsuarioIdAndAplicacionId(Long usuarioId, Long aplicacionId);
     
-    // Buscar licencia específica por usuario y aplicación (NUEVO)
+    // Buscar licencia específica por usuario y aplicación
     Optional<Licencia> findByUsuarioIdAndAplicacionId(Long usuarioId, Long aplicacionId);
+
+    // Buscar licencia por email de usuario y aplicación
+    Optional<Licencia> findByUsuarioEmailAndAplicacionId(String email, Long aplicacionId);
     
     // Buscar licencias de una aplicación específica
     List<Licencia> findByAplicacionId(Long aplicacionId);
