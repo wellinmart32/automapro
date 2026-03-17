@@ -56,6 +56,26 @@ public class PublicController {
     }
 
     /**
+     * Verificar versión actual de una aplicación por nombre (sin autenticación)
+     * GET /api/public/version?nombre=MensajesBiblicos
+     */
+    @GetMapping("/version")
+    public ResponseEntity<?> verificarVersion(@RequestParam String nombre) {
+        return aplicacionRepository.findByNombreContainingIgnoreCase(nombre)
+                .stream()
+                .filter(a -> a.getActivo())
+                .findFirst()
+                .map(app -> {
+                    Map<String, String> respuesta = new HashMap<>();
+                    respuesta.put("nombre", app.getNombre());
+                    respuesta.put("version", app.getVersion());
+                    respuesta.put("rutaArchivo", app.getRutaArchivo() != null ? app.getRutaArchivo() : "");
+                    return ResponseEntity.ok(respuesta);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
      * Obtener detalle de una aplicación específica (sin autenticación)
      * GET /api/public/aplicaciones/{id}
      */
