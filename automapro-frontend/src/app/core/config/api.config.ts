@@ -2,7 +2,7 @@
  * Configuración centralizada de URLs del API
  */
 export const API_CONFIG = {
-  baseUrl: 'http://localhost:8080',
+  baseUrl: 'https://automapro-backend.onrender.com',
   endpoints: {
     auth: '/api/auth',
     admin: {
