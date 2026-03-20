@@ -89,11 +89,8 @@ public class PagoController {
             custom.put("usuarioEmail", email);
 
             checkoutData2.put("custom", custom);
-            checkoutOptions.put("embed", false);
-            checkoutOptions.put("success_url", "https://automapro-frontend.vercel.app/cliente/pago-exitoso");
-            checkoutOptions.put("cancel_url", "https://automapro-frontend.vercel.app/cliente/pago-cancelado");
-
-            attributes.put("checkout_options", checkoutOptions);
+            attributes.put("success_url", "https://automapro-frontend.vercel.app/cliente/pago-exitoso");
+            attributes.put("cancel_url", "https://automapro-frontend.vercel.app/cliente/pago-cancelado");
             attributes.put("checkout_data", checkoutData2);
             attributes.put("expires_at", (Object) null);
 
