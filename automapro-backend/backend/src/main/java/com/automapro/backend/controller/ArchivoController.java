@@ -4,20 +4,14 @@ import com.automapro.backend.entity.Aplicacion;
 import com.automapro.backend.repository.AplicacionRepository;
 import com.automapro.backend.service.AplicacionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +20,14 @@ import java.util.Map;
 @CrossOrigin(origins = "${cors.origenes.permitidos}")
 public class ArchivoController {
 
-    private final Path directorioInstaladores = Paths.get("instaladores");
+    @Value("${supabase.url}")
+    private String supabaseUrl;
+
+    @Value("${supabase.service-role-key}")
+    private String supabaseServiceRoleKey;
+
+    @Value("${supabase.storage.bucket}")
+    private String supabaseBucket;
 
     @Autowired
     private AplicacionService aplicacionService;
@@ -34,16 +35,10 @@ public class ArchivoController {
     @Autowired
     private AplicacionRepository aplicacionRepository;
 
-    public ArchivoController() {
-        try {
-            Files.createDirectories(directorioInstaladores);
-        } catch (IOException e) {
-            throw new RuntimeException("No se pudo crear el directorio para instaladores", e);
-        }
-    }
+    private final RestTemplate restTemplate = new RestTemplate();
 
     /**
-     * Subir instalador para una aplicación (solo ADMIN)
+     * Subir instalador a Supabase Storage (solo ADMIN)
      */
     @PostMapping("/subir/{aplicacionId}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -58,37 +53,38 @@ public class ArchivoController {
                 return ResponseEntity.badRequest().body(error);
             }
 
-            // Buscar aplicación
             Aplicacion aplicacion = aplicacionRepository.findById(aplicacionId)
                     .orElseThrow(() -> new RuntimeException("Aplicación no encontrada"));
 
-            // ELIMINAR ARCHIVO ANTERIOR si existe
+            // Eliminar archivo anterior de Supabase si existe
             if (aplicacion.getRutaArchivo() != null && !aplicacion.getRutaArchivo().isEmpty()) {
-                String nombreArchivoViejo = aplicacion.getRutaArchivo().replace("instaladores/", "");
-                Path rutaArchivoViejo = directorioInstaladores.resolve(nombreArchivoViejo);
-                
-                try {
-                    Files.deleteIfExists(rutaArchivoViejo);
-                    System.out.println("Archivo anterior eliminado: " + nombreArchivoViejo);
-                } catch (IOException e) {
-                    System.err.println("No se pudo eliminar archivo anterior: " + e.getMessage());
-                }
+                eliminarDeSupabase(aplicacion.getRutaArchivo());
             }
 
-            // Generar nombre único para el nuevo archivo
+            // Generar nombre único
             String nombreOriginal = archivo.getOriginalFilename();
-            String extension = nombreOriginal != null && nombreOriginal.contains(".") 
-                ? nombreOriginal.substring(nombreOriginal.lastIndexOf(".")) 
-                : "";
+            String extension = (nombreOriginal != null && nombreOriginal.contains("."))
+                    ? nombreOriginal.substring(nombreOriginal.lastIndexOf("."))
+                    : ".exe";
             String nombreArchivo = "app_" + aplicacionId + "_" + System.currentTimeMillis() + extension;
 
-            // Guardar el nuevo archivo
-            Path rutaDestino = directorioInstaladores.resolve(nombreArchivo);
-            Files.copy(archivo.getInputStream(), rutaDestino, StandardCopyOption.REPLACE_EXISTING);
+            // Subir a Supabase Storage
+            String uploadUrl = supabaseUrl + "/storage/v1/object/" + supabaseBucket + "/" + nombreArchivo;
 
-            // Actualizar ruta en la BD
-            String rutaRelativa = "instaladores/" + nombreArchivo;
-            aplicacionService.actualizarRutaArchivo(aplicacionId, rutaRelativa);
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + supabaseServiceRoleKey);
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+            HttpEntity<byte[]> requestEntity = new HttpEntity<>(archivo.getBytes(), headers);
+            ResponseEntity<String> supabaseResponse = restTemplate.exchange(
+                    uploadUrl, HttpMethod.POST, requestEntity, String.class);
+
+            if (!supabaseResponse.getStatusCode().is2xxSuccessful()) {
+                throw new RuntimeException("Error al subir a Supabase: " + supabaseResponse.getBody());
+            }
+
+            // Guardar nombre del archivo en la BD
+            aplicacionService.actualizarRutaArchivo(aplicacionId, nombreArchivo);
 
             Map<String, String> respuesta = new HashMap<>();
             respuesta.put("mensaje", "Archivo subido exitosamente");
@@ -97,37 +93,34 @@ public class ArchivoController {
 
         } catch (IOException e) {
             Map<String, String> error = new HashMap<>();
-            error.put("mensaje", "Error al guardar el archivo: " + e.getMessage());
+            error.put("mensaje", "Error al procesar el archivo: " + e.getMessage());
             return ResponseEntity.internalServerError().body(error);
         }
     }
 
     /**
-     * Descargar instalador (público - sin autenticación)
+     * Descargar instalador — redirige a URL pública de Supabase Storage
      */
     @GetMapping("/descargar/{nombreArchivo}")
-    public ResponseEntity<Resource> descargarArchivo(@PathVariable String nombreArchivo) {
+    public ResponseEntity<?> descargarArchivo(@PathVariable String nombreArchivo) {
+        String urlPublica = supabaseUrl + "/storage/v1/object/public/" + supabaseBucket + "/" + nombreArchivo;
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .header(HttpHeaders.LOCATION, urlPublica)
+                .build();
+    }
+
+    /**
+     * Eliminar archivo de Supabase Storage
+     */
+    private void eliminarDeSupabase(String nombreArchivo) {
         try {
-            Path rutaArchivo = directorioInstaladores.resolve(nombreArchivo).normalize();
-            Resource recurso = new UrlResource(rutaArchivo.toUri());
-
-            if (!recurso.exists() || !recurso.isReadable()) {
-                return ResponseEntity.notFound().build();
-            }
-
-            String tipoContenido = Files.probeContentType(rutaArchivo);
-            if (tipoContenido == null) {
-                tipoContenido = "application/octet-stream";
-            }
-
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(tipoContenido))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, 
-                            "attachment; filename=\"" + recurso.getFilename() + "\"")
-                    .body(recurso);
-
+            String deleteUrl = supabaseUrl + "/storage/v1/object/" + supabaseBucket + "/" + nombreArchivo;
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + supabaseServiceRoleKey);
+            HttpEntity<?> requestEntity = new HttpEntity<>(headers);
+            restTemplate.exchange(deleteUrl, HttpMethod.DELETE, requestEntity, String.class);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+            System.err.println("No se pudo eliminar archivo anterior de Supabase: " + e.getMessage());
         }
     }
 }
