@@ -24,6 +24,13 @@ export class LicenciaService {
   }
 
   /**
+   * Obtener mis apps (licencias del usuario autenticado)
+   */
+  obtenerMisApps(): Observable<any[]> {
+    return this.http.get<any[]>(`${API_CONFIG.baseUrl}/api/cliente/mis-apps`);
+  }
+
+  /**
    * Listar todas las licencias
    */
   listarTodas(): Observable<Licencia[]> {

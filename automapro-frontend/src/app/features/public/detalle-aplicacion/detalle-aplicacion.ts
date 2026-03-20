@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AplicacionService } from '../../../core/services/aplicacion';
 import { LicenciaService } from '../../../core/services/licencia';
 import { Auth } from '../../../core/services/auth';
@@ -8,7 +8,7 @@ import { Aplicacion } from '../../../core/models/aplicacion.model';
 
 @Component({
   selector: 'app-detalle-aplicacion',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './detalle-aplicacion.html',
   styleUrl: './detalle-aplicacion.scss'
 })
@@ -22,6 +22,10 @@ export class DetalleAplicacion implements OnInit {
   mostrarModalLicencia = false;
   licenciaGenerada: any = null;
 
+  // Estado de licencia existente
+  licenciaExistente: any = null;
+  verificandoLicencia = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -34,6 +38,9 @@ export class DetalleAplicacion implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.cargarDetalle(+id);
+      if (this.authService.estaAutenticado()) {
+        this.verificarLicenciaExistente(+id);
+      }
     } else {
       this.mensajeError = 'ID de aplicación no válido';
     }
@@ -137,6 +144,29 @@ export class DetalleAplicacion implements OnInit {
         app: this.aplicacion.id
       }
     });
+  }
+
+  /**
+   * Verificar si el usuario ya tiene licencia para esta app
+   */
+  verificarLicenciaExistente(aplicacionId: number): void {
+    this.verificandoLicencia = true;
+    this.licenciaService.obtenerMisApps().subscribe({
+      next: (licencias) => {
+        this.licenciaExistente = licencias.find((l: any) => l.aplicacionId === aplicacionId) || null;
+        this.verificandoLicencia = false;
+      },
+      error: () => {
+        this.verificandoLicencia = false;
+      }
+    });
+  }
+
+  /**
+   * Verificar si el usuario está autenticado
+   */
+  estaAutenticado(): boolean {
+    return this.authService.estaAutenticado();
   }
 
   /**

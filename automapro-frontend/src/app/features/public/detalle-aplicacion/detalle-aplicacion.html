@@ -111,34 +111,68 @@
         <!-- Botones de acción -->
         <div class="d-grid gap-3">
 
-          <!-- Botón Descargar Trial -->
-          <button
-            class="btn btn-success btn-lg"
-            (click)="descargarTrial()"
-            [disabled]="descargando">
-            <span *ngIf="!descargando">
+          <!-- Ya tiene licencia FULL -->
+          <div *ngIf="licenciaExistente && licenciaExistente.tipoLicencia === 'FULL'">
+            <div class="alert alert-success mb-3">
+              <i class="bi bi-check-circle-fill me-2"></i>
+              <strong>¡Ya tienes esta aplicación!</strong><br>
+              <small>Licencia completa activa</small>
+            </div>
+            <button class="btn btn-primary btn-lg w-100" (click)="descargarInstalador()">
               <i class="bi bi-download me-2"></i>
-              Descargar Trial ({{ aplicacion.diasTrial || 30 }} días)
-            </span>
-            <span *ngIf="descargando">
-              <span class="spinner-border spinner-border-sm me-2"></span>
-              Generando licencia...
-            </span>
-          </button>
+              Descargar Instalador
+            </button>
+            <a routerLink="/cliente/mis-aplicaciones" class="btn btn-outline-secondary btn-lg w-100 mt-2">
+              <i class="bi bi-box-seam me-2"></i>
+              Ver en Mis Aplicaciones
+            </a>
+          </div>
 
-          <!-- Botón Comprar -->
-          <button
-            class="btn btn-primary btn-lg"
-            (click)="comprarCompleta()"
-            *ngIf="aplicacion.precio && aplicacion.precio > 0">
-            <i class="bi bi-cart-check me-2"></i>
-            Comprar - {{ formatoPrecio(aplicacion.precio) }}
-          </button>
+          <!-- Tiene licencia TRIAL -->
+          <div *ngIf="licenciaExistente && licenciaExistente.tipoLicencia === 'TRIAL'">
+            <div class="alert alert-info mb-3">
+              <i class="bi bi-clock me-2"></i>
+              <strong>Tienes el trial activo</strong><br>
+              <small>{{ licenciaExistente.diasTrial }} días de prueba</small>
+            </div>
+            <button class="btn btn-success btn-lg w-100" (click)="descargarInstalador()">
+              <i class="bi bi-download me-2"></i>
+              Descargar Instalador
+            </button>
+            <button class="btn btn-primary btn-lg w-100 mt-2" (click)="comprarCompleta()">
+              <i class="bi bi-cart-check me-2"></i>
+              Comprar Versión Completa
+            </button>
+          </div>
 
-          <!-- Si es gratis -->
-          <div class="alert alert-success mb-0" *ngIf="!aplicacion.precio || aplicacion.precio === 0">
-            <i class="bi bi-gift-fill me-2"></i>
-            <strong>¡Aplicación Gratuita!</strong> Descarga sin costo adicional.
+          <!-- No tiene licencia -->
+          <div *ngIf="!licenciaExistente && !verificandoLicencia">
+            <button
+              class="btn btn-success btn-lg w-100"
+              (click)="descargarTrial()"
+              [disabled]="descargando">
+              <span *ngIf="!descargando">
+                <i class="bi bi-download me-2"></i>
+                Descargar Trial ({{ aplicacion.diasTrial || 30 }} días)
+              </span>
+              <span *ngIf="descargando">
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Generando licencia...
+              </span>
+            </button>
+            <button
+              class="btn btn-primary btn-lg w-100 mt-2"
+              (click)="comprarCompleta()"
+              *ngIf="aplicacion.precio && aplicacion.precio > 0">
+              <i class="bi bi-cart-check me-2"></i>
+              Comprar - {{ formatoPrecio(aplicacion.precio) }}
+            </button>
+          </div>
+
+          <!-- Verificando licencia -->
+          <div *ngIf="verificandoLicencia" class="text-center py-2">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Verificando licencia...
           </div>
 
         </div>

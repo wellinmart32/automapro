@@ -73,8 +73,12 @@ export const routes: Routes = [
         loadComponent: () => import('./features/cliente/dashboard/dashboard').then(m => m.Dashboard)
       },
       {
-        path: 'mis-aplicaciones',
+        path: 'mis-apps',
         loadComponent: () => import('./features/cliente/mis-apps/mis-apps').then(m => m.MisApps)
+      },
+      {
+        path: 'mis-aplicaciones',
+        redirectTo: 'mis-apps'
       },
       {
         path: 'comprar',
