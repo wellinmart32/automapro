@@ -60,27 +60,7 @@ export class MisApps implements OnInit {
       return;
     }
 
-    const mensaje = `Descargando: ${licencia.aplicacionNombre}\n\n` +
-      `Tu código de licencia:\n${licencia.codigo}\n\n` +
-      `IMPORTANTE: Guarda este código, lo necesitarás para activar la aplicación.\n\n` +
-      `La descarga comenzará en un momento...`;
-
-    alert(mensaje);
-
-    const nombreArchivo = this.extraerNombreArchivo(licencia.aplicacionRutaArchivo);
-
-    if (nombreArchivo) {
-      const urlDescarga = `${API_CONFIG.baseUrl}/api/archivos/descargar/${nombreArchivo}`;
-      
-      const link = document.createElement('a');
-      link.href = urlDescarga;
-      link.download = nombreArchivo;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else {
-      alert('Error al procesar la ruta del archivo. Contacta al administrador.');
-    }
+    window.open(licencia.aplicacionRutaArchivo, '_blank');
   }
 
   /**
