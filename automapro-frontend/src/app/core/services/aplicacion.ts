@@ -90,9 +90,9 @@ export class AplicacionService {
   }
 
   /**
-   * Descargar archivo instalador
+   * Descargar archivo instalador por ID de aplicación
    */
-  descargarArchivo(nombreArchivo: string): string {
-    return `${this.apiArchivos}/descargar/${nombreArchivo}`;
+  descargarArchivo(aplicacionId: number): string {
+    return `${this.apiArchivos}/descargar/${aplicacionId}`;
   }
 }
