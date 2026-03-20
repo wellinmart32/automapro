@@ -119,9 +119,12 @@ export class DetalleAplicacion implements OnInit {
       return;
     }
 
-    const nombreArchivo = this.aplicacion.rutaArchivo.split('/').pop() || '';
-    const urlDescarga = this.aplicacionService.descargarArchivo(nombreArchivo);
-    
+    if (!this.aplicacion?.id) {
+      alert('Error al obtener la aplicación');
+      return;
+    }
+
+    const urlDescarga = this.aplicacionService.descargarArchivo(this.aplicacion.id);
     window.open(urlDescarga, '_blank');
   }
 
