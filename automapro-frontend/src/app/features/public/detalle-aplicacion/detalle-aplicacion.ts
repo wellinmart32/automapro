@@ -119,13 +119,7 @@ export class DetalleAplicacion implements OnInit {
       return;
     }
 
-    if (!this.aplicacion?.id) {
-      alert('Error al obtener la aplicación');
-      return;
-    }
-
-    const urlDescarga = this.aplicacionService.descargarArchivo(this.aplicacion.id);
-    window.open(urlDescarga, '_blank');
+    window.open(this.aplicacion.rutaArchivo, '_blank');
   }
 
   /**
