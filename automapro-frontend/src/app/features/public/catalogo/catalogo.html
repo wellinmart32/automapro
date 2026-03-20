@@ -55,6 +55,11 @@
           <span class="visually-hidden">Cargando...</span>
         </div>
         <p class="text-muted mt-2">Cargando catálogo...</p>
+        <div *ngIf="mostrarMensajeEspera" class="alert alert-info mt-3 mx-auto" style="max-width: 450px;">
+          <i class="bi bi-info-circle me-2"></i>
+          <strong>Iniciando servidor...</strong><br>
+          <small>El servidor se activa automáticamente. Espera unos segundos.</small>
+        </div>
       </div>
     </div>
 

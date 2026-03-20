@@ -14,6 +14,7 @@ export class Catalogo implements OnInit {
   aplicaciones: Aplicacion[] = [];
   cargando = false;
   mensajeError = '';
+  mostrarMensajeEspera = false;
 
   constructor(
     private aplicacionService: AplicacionService,
@@ -24,34 +25,36 @@ export class Catalogo implements OnInit {
     this.cargarCatalogo();
   }
 
-  /**
-   * Cargar catálogo público de aplicaciones
-   */
   cargarCatalogo(): void {
     this.cargando = true;
+    this.mostrarMensajeEspera = false;
+
+    // Mostrar mensaje de espera después de 3 segundos
+    setTimeout(() => {
+      if (this.cargando) {
+        this.mostrarMensajeEspera = true;
+      }
+    }, 3000);
+
     this.aplicacionService.obtenerCatalogoPublico().subscribe({
       next: (aplicaciones) => {
         this.aplicaciones = aplicaciones;
         this.cargando = false;
+        this.mostrarMensajeEspera = false;
       },
       error: (error) => {
         console.error('Error al cargar catálogo:', error);
         this.mensajeError = 'Error al cargar el catálogo de aplicaciones';
         this.cargando = false;
+        this.mostrarMensajeEspera = false;
       }
     });
   }
 
-  /**
-   * Navegar al detalle de una aplicación
-   */
   verDetalle(id: number): void {
     this.router.navigate(['/aplicacion', id]);
   }
 
-  /**
-   * Formato de precio
-   */
   formatoPrecio(precio?: number): string {
     if (!precio || precio === 0) {
       return 'Gratis';
