@@ -76,16 +76,6 @@ export class MisApps implements OnInit {
   }
 
   /**
-   * Extraer nombre de archivo de la ruta almacenada
-   */
-  private extraerNombreArchivo(ruta: string): string | null {
-    if (!ruta) return null;
-
-    const partes = ruta.split('/');
-    return partes[partes.length - 1];
-  }
-
-  /**
    * Verificar si una licencia está vigente
    */
   estaVigente(licencia: Licencia): boolean {
