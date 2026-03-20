@@ -82,6 +82,7 @@ public class PagoController {
             Map<String, Object> checkoutOptions = new HashMap<>();
             Map<String, Object> checkoutData2 = new HashMap<>();
             Map<String, Object> custom = new HashMap<>();
+            Map<String, Object> productOptions = new HashMap<>();
 
             // Metadata para identificar la licencia
             custom.put("licenciaId", licencia != null ? licencia.getId().toString() : "nueva");
@@ -89,8 +90,8 @@ public class PagoController {
             custom.put("usuarioEmail", email);
 
             checkoutData2.put("custom", custom);
-            attributes.put("success_url", "https://automapro-frontend.vercel.app/cliente/pago-exitoso");
-            attributes.put("cancel_url", "https://automapro-frontend.vercel.app/cliente/pago-cancelado");
+            productOptions.put("redirect_url", "https://automapro-frontend.vercel.app/cliente/pago-exitoso");
+            attributes.put("product_options", productOptions);
             attributes.put("checkout_data", checkoutData2);
             attributes.put("expires_at", (Object) null);
 
