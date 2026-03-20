@@ -36,6 +36,9 @@ public class PagoController {
     @Value("${lemonsqueezy.variant.id}")
     private String lsVariantId;
 
+    @Value("${lemonsqueezy.store.id}")
+    private String lsStoreId;
+
     @Autowired
     private AplicacionRepository aplicacionRepository;
 
@@ -98,6 +101,13 @@ public class PagoController {
             variantData.put("id", lsVariantId);
             variant.put("data", variantData);
             relationships.put("variant", variant);
+
+            Map<String, Object> store = new HashMap<>();
+            Map<String, Object> storeData = new HashMap<>();
+            storeData.put("type", "stores");
+            storeData.put("id", lsStoreId);
+            store.put("data", storeData);
+            relationships.put("store", store);
 
             data.put("type", "checkouts");
             data.put("attributes", attributes);
