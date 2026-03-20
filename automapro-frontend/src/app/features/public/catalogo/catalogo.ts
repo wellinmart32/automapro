@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AplicacionService } from '../../../core/services/aplicacion';
 import { Aplicacion } from '../../../core/models/aplicacion.model';
+import { Auth } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-catalogo',
@@ -18,7 +19,8 @@ export class Catalogo implements OnInit {
 
   constructor(
     private aplicacionService: AplicacionService,
-    private router: Router
+    private router: Router,
+    private authService: Auth
   ) {}
 
   ngOnInit(): void {
@@ -53,6 +55,10 @@ export class Catalogo implements OnInit {
 
   verDetalle(id: number): void {
     this.router.navigate(['/aplicacion', id]);
+  }
+
+  estaAutenticado(): boolean {
+    return this.authService.estaAutenticado();
   }
 
   formatoPrecio(precio?: number): string {

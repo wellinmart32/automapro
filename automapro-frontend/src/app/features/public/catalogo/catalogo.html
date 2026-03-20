@@ -11,7 +11,7 @@
   </div>
 
   <!-- Barra de navegación alternativa para usuarios no autenticados -->
-  <div class="row bg-light border-bottom py-3">
+  <div class="row bg-light border-bottom py-3" *ngIf="!estaAutenticado()">
     <div class="col-12 d-flex justify-content-end">
       <a routerLink="/login" class="btn btn-outline-primary me-2">
         <i class="bi bi-box-arrow-in-right me-1"></i>
@@ -287,13 +287,17 @@
     <div class="col-12">
       <h2 class="fw-bold mb-3">¿Listo para automatizar?</h2>
       <p class="lead opacity-75 mb-4">Descarga gratis hoy. Sin tarjeta. Sin compromisos.</p>
-      <a href="#" class="btn btn-light btn-lg text-primary me-2">
-        <i class="bi bi-download me-2"></i>
-        Descargar trial gratis
+      <a routerLink="/catalogo" class="btn btn-light btn-lg text-primary me-2" *ngIf="!estaAutenticado()">
+        <i class="bi bi-grid-3x3-gap me-2"></i>
+        Ver aplicaciones
       </a>
-      <a routerLink="/registro" class="btn btn-outline-light btn-lg">
+      <a routerLink="/registro" class="btn btn-outline-light btn-lg" *ngIf="!estaAutenticado()">
         <i class="bi bi-person-plus me-2"></i>
         Crear cuenta
+      </a>
+      <a routerLink="/cliente/mis-apps" class="btn btn-light btn-lg text-primary" *ngIf="estaAutenticado()">
+        <i class="bi bi-box-seam me-2"></i>
+        Ir a Mis Aplicaciones
       </a>
     </div>
   </div>
@@ -313,7 +317,7 @@
               © 2025 AutomaPro. Todos los derechos reservados.
             </span>
           </div>
-          <div class="col-12 col-md-4 text-center text-md-end">
+          <div class="col-12 col-md-4 text-center text-md-end" *ngIf="!estaAutenticado()">
             <a routerLink="/login" class="text-muted text-decoration-none me-3 small">Iniciar sesión</a>
             <a routerLink="/registro" class="text-muted text-decoration-none small">Registrarse</a>
           </div>
