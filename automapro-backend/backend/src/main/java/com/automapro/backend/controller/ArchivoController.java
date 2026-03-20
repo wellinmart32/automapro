@@ -99,13 +99,23 @@ public class ArchivoController {
     }
 
     /**
-     * Descargar instalador — redirige a URL pública de Supabase Storage
+     * Descargar instalador por ID de aplicación — redirige a URL de GitHub Releases
      */
-    @GetMapping("/descargar/{nombreArchivo}")
-    public ResponseEntity<?> descargarArchivo(@PathVariable String nombreArchivo) {
-        String urlPublica = supabaseUrl + "/storage/v1/object/public/" + supabaseBucket + "/" + nombreArchivo;
+    @GetMapping("/descargar/{aplicacionId}")
+    public ResponseEntity<?> descargarArchivo(@PathVariable Long aplicacionId) {
+        Aplicacion aplicacion = aplicacionRepository.findById(aplicacionId)
+                .orElseThrow(() -> new RuntimeException("Aplicación no encontrada"));
+
+        String urlDescarga = aplicacion.getRutaArchivo();
+
+        if (urlDescarga == null || urlDescarga.isEmpty()) {
+            Map<String, String> error = new HashMap<>();
+            error.put("mensaje", "No hay instalador disponible para esta aplicación");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+
         return ResponseEntity.status(HttpStatus.FOUND)
-                .header(HttpHeaders.LOCATION, urlPublica)
+                .header(HttpHeaders.LOCATION, urlDescarga)
                 .build();
     }
 
