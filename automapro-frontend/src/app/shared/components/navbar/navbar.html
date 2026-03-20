@@ -2,7 +2,7 @@
   <div class="container-fluid">
 
     <!-- Logo/Marca -->
-    <a class="navbar-brand fw-bold" routerLink="/catalogo">
+    <a class="navbar-brand fw-bold text-white" routerLink="/catalogo">
       <i class="bi bi-robot me-2"></i>
       AutomaPro
     </a>
@@ -25,9 +25,9 @@
       <!-- Menú para usuarios NO autenticados -->
       <ul class="navbar-nav me-auto" *ngIf="!estaAutenticado()">
         <li class="nav-item">
-          <a class="nav-link fw-semibold px-3 py-2 rounded"
+          <a class="nav-link fw-semibold px-3 py-2 rounded text-white opacity-75"
              routerLink="/catalogo"
-             routerLinkActive="bg-white text-primary"
+             routerLinkActive="bg-white text-primary opacity-100"
              [routerLinkActiveOptions]="{exact: true}">
             <i class="bi bi-grid-3x3-gap me-1"></i>
             Catálogo
@@ -38,33 +38,33 @@
       <!-- Menú Admin (autenticado como ADMIN) -->
       <ul class="navbar-nav me-auto" *ngIf="estaAutenticado() && esAdmin">
         <li class="nav-item">
-          <a class="nav-link fw-semibold px-3 py-2 rounded"
+          <a class="nav-link fw-semibold px-3 py-2 rounded text-white opacity-75"
              routerLink="/admin/tablero"
-             routerLinkActive="bg-white text-primary">
+             routerLinkActive="bg-white text-primary opacity-100">
             <i class="bi bi-speedometer2 me-1"></i>
             Tablero
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link fw-semibold px-3 py-2 rounded"
+          <a class="nav-link fw-semibold px-3 py-2 rounded text-white opacity-75"
              routerLink="/admin/usuarios"
-             routerLinkActive="bg-white text-primary">
+             routerLinkActive="bg-white text-primary opacity-100">
             <i class="bi bi-people me-1"></i>
             Usuarios
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link fw-semibold px-3 py-2 rounded"
+          <a class="nav-link fw-semibold px-3 py-2 rounded text-white opacity-75"
              routerLink="/admin/aplicaciones"
-             routerLinkActive="bg-white text-primary">
+             routerLinkActive="bg-white text-primary opacity-100">
             <i class="bi bi-app me-1"></i>
             Aplicaciones
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link fw-semibold px-3 py-2 rounded"
+          <a class="nav-link fw-semibold px-3 py-2 rounded text-white opacity-75"
              routerLink="/admin/licencias"
-             routerLinkActive="bg-white text-primary">
+             routerLinkActive="bg-white text-primary opacity-100">
             <i class="bi bi-key me-1"></i>
             Licencias
           </a>
@@ -74,26 +74,26 @@
       <!-- Menú Cliente (autenticado como CLIENTE) -->
       <ul class="navbar-nav me-auto" *ngIf="estaAutenticado() && !esAdmin">
         <li class="nav-item">
-          <a class="nav-link fw-semibold px-3 py-2 rounded"
+          <a class="nav-link fw-semibold px-3 py-2 rounded text-white opacity-75"
              routerLink="/catalogo"
-             routerLinkActive="bg-white text-primary"
+             routerLinkActive="bg-white text-primary opacity-100"
              [routerLinkActiveOptions]="{exact: true}">
             <i class="bi bi-grid-3x3-gap me-1"></i>
             Catálogo
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link fw-semibold px-3 py-2 rounded"
+          <a class="nav-link fw-semibold px-3 py-2 rounded text-white opacity-75"
              routerLink="/cliente/tablero"
-             routerLinkActive="bg-white text-primary">
+             routerLinkActive="bg-white text-primary opacity-100">
             <i class="bi bi-speedometer2 me-1"></i>
             Inicio
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link fw-semibold px-3 py-2 rounded"
+          <a class="nav-link fw-semibold px-3 py-2 rounded text-white opacity-75"
              routerLink="/cliente/mis-apps"
-             routerLinkActive="bg-white text-primary">
+             routerLinkActive="bg-white text-primary opacity-100">
             <i class="bi bi-box-seam me-1"></i>
             Mis Aplicaciones
           </a>
@@ -103,15 +103,15 @@
       <!-- Botones de Login/Registro (NO autenticado) -->
       <ul class="navbar-nav" *ngIf="!estaAutenticado()">
         <li class="nav-item">
-          <a class="nav-link fw-semibold px-3 py-2 rounded"
+          <a class="nav-link fw-semibold px-3 py-2 rounded text-white opacity-75"
              routerLink="/login"
-             routerLinkActive="bg-white text-primary">
+             routerLinkActive="bg-white text-primary opacity-100">
             <i class="bi bi-box-arrow-in-right me-1"></i>
             Iniciar Sesión
           </a>
         </li>
         <li class="nav-item ms-1">
-          <a class="btn btn-outline-light btn-sm px-3 py-2"
+          <a class="btn btn-outline-light fw-semibold btn-sm px-3 py-2"
              routerLink="/registro">
             <i class="bi bi-person-plus me-1"></i>
             Registrarse
@@ -122,7 +122,7 @@
       <!-- Usuario y cerrar sesión (autenticado) -->
       <ul class="navbar-nav" *ngIf="estaAutenticado()">
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle fw-semibold"
+          <a class="nav-link dropdown-toggle fw-semibold text-white"
              href="#"
              id="navbarDropdown"
              role="button"
