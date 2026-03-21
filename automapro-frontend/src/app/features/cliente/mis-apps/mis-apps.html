@@ -77,12 +77,12 @@
           <!-- Tipo y Estado de la licencia -->
           <div class="mb-3">
             <div class="d-flex gap-2 flex-wrap">
-              <!-- Badge Tipo -->
-              <span class="badge" [ngClass]="licencia.tipoLicencia === 'FULL' ? 'bg-primary' : 'bg-warning'">
-                {{ licencia.tipoLicencia === 'FULL' ? 'Completa' : 'Trial' }}
+              <!-- Badge Tipo — solo para FULL -->
+              <span class="badge bg-primary" *ngIf="licencia.tipoLicencia === 'FULL'">
+                Completa
               </span>
               
-              <!-- Badge Estado -->
+              <!-- Badge Estado — solo para TRIAL -->
               <span class="badge" [ngClass]="getClaseEstado(licencia)" *ngIf="licencia.tipoLicencia !== 'FULL'">
                 {{ getEstadoLicencia(licencia) }}
               </span>
@@ -96,8 +96,11 @@
               <span *ngIf="licencia.fechaExpiracion">
                 Expira: {{ licencia.fechaExpiracion | date:'dd/MM/yyyy' }}
               </span>
-              <span *ngIf="!licencia.fechaExpiracion">
+              <span *ngIf="!licencia.fechaExpiracion && licencia.tipoLicencia === 'FULL'">
                 Licencia Permanente
+              </span>
+              <span *ngIf="!licencia.fechaExpiracion && licencia.tipoLicencia !== 'FULL'">
+                Trial activo
               </span>
             </small>
           </div>
