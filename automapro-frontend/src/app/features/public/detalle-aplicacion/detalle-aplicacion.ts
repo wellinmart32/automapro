@@ -133,11 +133,8 @@ export class DetalleAplicacion implements OnInit {
     }
 
     if (!this.authService.estaAutenticado()) {
-      this.router.navigate(['/login'], {
-        queryParams: {
-          returnUrl: `/cliente/comprar?app=${this.aplicacion.id}`
-        }
-      });
+      sessionStorage.setItem('returnUrl', `/cliente/comprar?app=${this.aplicacion.id}`);
+      this.router.navigate(['/login']);
       return;
     }
 

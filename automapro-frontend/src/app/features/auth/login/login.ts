@@ -35,6 +35,12 @@ export class Login {
         this.returnUrl = params['returnUrl'];
       }
     });
+    // Leer returnUrl desde sessionStorage (usado cuando viene con query params complejos)
+    const storedUrl = sessionStorage.getItem('returnUrl');
+    if (storedUrl) {
+      this.returnUrl = storedUrl;
+      sessionStorage.removeItem('returnUrl');
+    }
   }
 
   /**

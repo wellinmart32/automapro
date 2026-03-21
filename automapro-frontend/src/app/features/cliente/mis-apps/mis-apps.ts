@@ -105,7 +105,7 @@ export class MisApps implements OnInit {
     }
 
     if (!licencia.fechaExpiracion) {
-      return 'Trial Permanente';
+      return 'Trial activo';
     }
 
     const hoy = new Date();
