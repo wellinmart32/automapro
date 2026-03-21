@@ -35,12 +35,6 @@ export class Login {
         this.returnUrl = params['returnUrl'];
       }
     });
-    // Leer returnUrl desde localStorage (usado cuando viene con query params complejos)
-    const storedUrl = localStorage.getItem('returnUrl');
-    if (storedUrl) {
-      this.returnUrl = storedUrl;
-      localStorage.removeItem('returnUrl');
-    }
   }
 
   /**
@@ -59,12 +53,19 @@ export class Login {
     this.authService.login(this.solicitud).subscribe({
       next: (respuesta) => {
         this.cargando = false;
-        
+
         // Redirigir según el rol
         if (respuesta.rol === CONSTANTES.ROLES.ADMIN) {
           this.router.navigate(['/admin/tablero']);
         } else {
-          this.router.navigate([this.returnUrl]);
+          // Verificar localStorage para returnUrl con query params complejos
+          const storedUrl = localStorage.getItem('returnUrl');
+          if (storedUrl) {
+            localStorage.removeItem('returnUrl');
+            window.location.href = storedUrl;
+          } else {
+            this.router.navigate([this.returnUrl]);
+          }
         }
       },
       error: (error) => {
