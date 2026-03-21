@@ -55,8 +55,8 @@
             </small>
           </p>
 
-          <!-- Código de licencia -->
-          <div class="mb-3">
+          <!-- Código de licencia — solo visible para FULL -->
+          <div class="mb-3" *ngIf="licencia.tipoLicencia === 'FULL'">
             <small class="text-muted d-block mb-1">Código de Licencia:</small>
             <div class="input-group input-group-sm">
               <input 

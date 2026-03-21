@@ -69,7 +69,9 @@ export class DetalleAplicacion implements OnInit {
    */
   descargarTrial(): void {
     if (!this.authService.estaAutenticado()) {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url }
+      });
       return;
     }
 

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { Auth } from '../../../core/services/auth';
 import { SolicitudLogin } from '../../../core/models/solicitud-login.model';
 import { CONSTANTES } from '../../../core/config/constantes';
@@ -23,10 +23,19 @@ export class Login {
   cargando = false;
   mensajeError = '';
 
+  returnUrl: string = '/cliente/tablero';
+
   constructor(
     private authService: Auth,
-    private router: Router
-  ) {}
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
+    this.route.queryParams.subscribe(params => {
+      if (params['returnUrl']) {
+        this.returnUrl = params['returnUrl'];
+      }
+    });
+  }
 
   /**
    * Iniciar sesión
@@ -49,7 +58,7 @@ export class Login {
         if (respuesta.rol === CONSTANTES.ROLES.ADMIN) {
           this.router.navigate(['/admin/tablero']);
         } else {
-          this.router.navigate(['/cliente/tablero']);
+          this.router.navigate([this.returnUrl]);
         }
       },
       error: (error) => {
