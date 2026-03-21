@@ -128,20 +128,21 @@ export class DetalleAplicacion implements OnInit {
    * Comprar versión completa
    */
   comprarCompleta(): void {
-    if (!this.authService.estaAutenticado()) {
-      this.router.navigate(['/login']);
-      return;
-    }
-
     if (!this.aplicacion || !this.aplicacion.id) {
       return;
     }
 
-    // Redirigir a la página de compra
+    if (!this.authService.estaAutenticado()) {
+      this.router.navigate(['/login'], {
+        queryParams: {
+          returnUrl: `/cliente/comprar?app=${this.aplicacion.id}`
+        }
+      });
+      return;
+    }
+
     this.router.navigate(['/cliente/comprar'], {
-      queryParams: {
-        app: this.aplicacion.id
-      }
+      queryParams: { app: this.aplicacion.id }
     });
   }
 
