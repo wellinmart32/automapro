@@ -133,7 +133,7 @@ export class DetalleAplicacion implements OnInit {
     }
 
     if (!this.authService.estaAutenticado()) {
-      sessionStorage.setItem('returnUrl', `/cliente/comprar?app=${this.aplicacion.id}`);
+      localStorage.setItem('returnUrl', `/cliente/comprar?app=${this.aplicacion.id}`);
       this.router.navigate(['/login']);
       return;
     }
