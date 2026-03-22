@@ -21,6 +21,7 @@
 
       <!-- Datos personales -->
       <div class="col-12 col-lg-6">
+
         <div class="card border-0 shadow-sm h-100">
           <div class="card-body p-4">
             <h5 class="card-title mb-4">
@@ -87,18 +88,33 @@
 
             <div class="mb-3">
               <label class="form-label text-muted small">Contraseña actual</label>
-              <input type="password" class="form-control" [(ngModel)]="passwordActual" placeholder="••••••••">
+              <div class="input-group">
+                <input [type]="verActual ? 'text' : 'password'" class="form-control" [(ngModel)]="passwordActual" placeholder="••••••••">
+                <button class="btn btn-outline-secondary" type="button" (click)="verActual = !verActual">
+                  <i class="bi" [ngClass]="verActual ? 'bi-eye-slash' : 'bi-eye'"></i>
+                </button>
+              </div>
             </div>
 
             <div class="mb-3">
               <label class="form-label text-muted small">Nueva contraseña</label>
-              <input type="password" class="form-control" [(ngModel)]="passwordNueva" placeholder="••••••••">
+              <div class="input-group">
+                <input [type]="verNueva ? 'text' : 'password'" class="form-control" [(ngModel)]="passwordNueva" placeholder="••••••••">
+                <button class="btn btn-outline-secondary" type="button" (click)="verNueva = !verNueva">
+                  <i class="bi" [ngClass]="verNueva ? 'bi-eye-slash' : 'bi-eye'"></i>
+                </button>
+              </div>
               <small class="text-muted">Mínimo 6 caracteres</small>
             </div>
 
             <div class="mb-4">
               <label class="form-label text-muted small">Confirmar nueva contraseña</label>
-              <input type="password" class="form-control" [(ngModel)]="passwordConfirmar" placeholder="••••••••">
+              <div class="input-group">
+                <input [type]="verConfirmar ? 'text' : 'password'" class="form-control" [(ngModel)]="passwordConfirmar" placeholder="••••••••">
+                <button class="btn btn-outline-secondary" type="button" (click)="verConfirmar = !verConfirmar">
+                  <i class="bi" [ngClass]="verConfirmar ? 'bi-eye-slash' : 'bi-eye'"></i>
+                </button>
+              </div>
             </div>
 
             <button class="btn btn-primary w-100" (click)="cambiarPassword()" [disabled]="guardandoPassword">

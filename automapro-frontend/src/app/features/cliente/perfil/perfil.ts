@@ -30,6 +30,11 @@ export class Perfil implements OnInit {
   mensajePassword = '';
   errorPassword = '';
 
+  // Visibilidad contraseñas
+  verActual = false;
+  verNueva = false;
+  verConfirmar = false;
+
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
