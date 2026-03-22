@@ -20,7 +20,7 @@ export class LicenciaService {
    * Generar licencia TRIAL automáticamente (requiere autenticación)
    */
   generarLicenciaTrial(aplicacionId: number): Observable<any> {
-    return this.http.post(`${this.apiPublicUrl}/generar-licencia-trial/${aplicacionId}`, {});
+    return this.http.post(`${API_CONFIG.baseUrl}/api/cliente/generar-licencia-trial/${aplicacionId}`, {});
   }
 
   /**

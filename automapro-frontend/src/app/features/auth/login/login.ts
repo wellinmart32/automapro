@@ -72,12 +72,12 @@ export class Login {
         this.cargando = false;
         console.error('Error en login:', error);
         
-        if (error.status === 401) {
+        if (error.status === 401 || error.status === 403) {
           this.mensajeError = 'Email o contraseña incorrectos';
         } else if (error.status === 0) {
-          this.mensajeError = 'No se pudo conectar con el servidor. Verifique que el backend esté ejecutándose.';
+          this.mensajeError = 'No se pudo conectar con el servidor. Intenta nuevamente en unos segundos.';
         } else {
-          this.mensajeError = error.error?.message || CONSTANTES.MENSAJES.ERROR_GENERAL;
+          this.mensajeError = 'Email o contraseña incorrectos';
         }
       }
     });
