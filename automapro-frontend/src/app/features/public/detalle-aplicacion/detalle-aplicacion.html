@@ -336,7 +336,7 @@
         </div>
 
         <!-- Instrucciones -->
-        <div class="card border-0 bg-light">
+        <div class="card border-0 bg-light mb-3">
           <div class="card-body">
             <h6 class="card-title">
               <i class="bi bi-info-circle me-2"></i>
@@ -349,6 +349,16 @@
               <li>¡Disfruta de tu período de prueba de {{ licenciaGenerada?.diasTrial || aplicacion?.diasTrial || 30 }} días!</li>
             </ol>
           </div>
+        </div>
+
+        <!-- Aviso SmartScreen -->
+        <div class="alert alert-info py-2 mb-0">
+          <small>
+            <i class="bi bi-shield-exclamation me-1"></i>
+            <strong>¿Tu navegador bloquea la descarga?</strong> Haz clic en los tres puntos
+            (<strong>...</strong>) junto al archivo → <strong>Conservar</strong> → 
+            <strong>Mostrar más</strong> → <strong>Conservar de todas formas</strong>.
+          </small>
         </div>
 
       </div>
