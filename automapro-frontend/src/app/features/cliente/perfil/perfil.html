@@ -1,0 +1,124 @@
+<div class="container py-4">
+
+  <!-- Encabezado -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2 class="mb-1">
+        <i class="bi bi-person-circle text-primary me-2"></i>
+        Mi Perfil
+      </h2>
+      <p class="text-muted">Administra tu información personal y seguridad</p>
+    </div>
+  </div>
+
+  <!-- Spinner -->
+  <div class="text-center py-5" *ngIf="cargando">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <div *ngIf="!cargando && perfil">
+    <div class="row g-4">
+
+      <!-- Datos personales -->
+      <div class="col-12 col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body p-4">
+            <h5 class="card-title mb-4">
+              <i class="bi bi-person text-primary me-2"></i>
+              Datos Personales
+            </h5>
+
+            <!-- Email (solo lectura) -->
+            <div class="mb-3">
+              <label class="form-label text-muted small">Correo Electrónico</label>
+              <input type="text" class="form-control" [value]="perfil.email" readonly>
+              <small class="text-muted">El email no puede modificarse</small>
+            </div>
+
+            <!-- Nombre -->
+            <div class="mb-3">
+              <label class="form-label text-muted small">Nombre completo</label>
+              <div *ngIf="!editandoNombre" class="d-flex gap-2">
+                <input type="text" class="form-control" [value]="perfil.nombre" readonly>
+                <button class="btn btn-outline-primary" (click)="editarNombre()">
+                  <i class="bi bi-pencil"></i>
+                </button>
+              </div>
+              <div *ngIf="editandoNombre">
+                <input type="text" class="form-control mb-2" [(ngModel)]="nuevoNombre" placeholder="Tu nombre completo">
+                <div class="d-flex gap-2">
+                  <button class="btn btn-primary" (click)="guardarNombre()" [disabled]="guardandoNombre">
+                    <span *ngIf="guardandoNombre" class="spinner-border spinner-border-sm me-1"></span>
+                    Guardar
+                  </button>
+                  <button class="btn btn-outline-secondary" (click)="cancelarEditarNombre()">Cancelar</button>
+                </div>
+              </div>
+              <div class="alert alert-success py-1 mt-2 small" *ngIf="mensajeNombre">{{ mensajeNombre }}</div>
+              <div class="alert alert-danger py-1 mt-2 small" *ngIf="errorNombre">{{ errorNombre }}</div>
+            </div>
+
+            <!-- Fecha de registro -->
+            <div class="mb-3">
+              <label class="form-label text-muted small">Miembro desde</label>
+              <input type="text" class="form-control" [value]="perfil.fechaCreacion | date:'dd/MM/yyyy'" readonly>
+            </div>
+
+            <!-- Rol -->
+            <div>
+              <label class="form-label text-muted small">Tipo de cuenta</label>
+              <div>
+                <span class="badge bg-primary">{{ perfil.rol === 'ROLE_ADMIN' ? 'Administrador' : 'Cliente' }}</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Cambiar contraseña -->
+      <div class="col-12 col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body p-4">
+            <h5 class="card-title mb-4">
+              <i class="bi bi-shield-lock text-primary me-2"></i>
+              Cambiar Contraseña
+            </h5>
+
+            <div class="mb-3">
+              <label class="form-label text-muted small">Contraseña actual</label>
+              <input type="password" class="form-control" [(ngModel)]="passwordActual" placeholder="••••••••">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label text-muted small">Nueva contraseña</label>
+              <input type="password" class="form-control" [(ngModel)]="passwordNueva" placeholder="••••••••">
+              <small class="text-muted">Mínimo 6 caracteres</small>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label text-muted small">Confirmar nueva contraseña</label>
+              <input type="password" class="form-control" [(ngModel)]="passwordConfirmar" placeholder="••••••••">
+            </div>
+
+            <button class="btn btn-primary w-100" (click)="cambiarPassword()" [disabled]="guardandoPassword">
+              <span *ngIf="guardandoPassword" class="spinner-border spinner-border-sm me-2"></span>
+              <i class="bi bi-lock me-2" *ngIf="!guardandoPassword"></i>
+              Actualizar Contraseña
+            </button>
+
+            <div class="alert alert-success py-2 mt-3 small" *ngIf="mensajePassword">
+              <i class="bi bi-check-circle me-1"></i>{{ mensajePassword }}
+            </div>
+            <div class="alert alert-danger py-2 mt-3 small" *ngIf="errorPassword">
+              <i class="bi bi-exclamation-triangle me-1"></i>{{ errorPassword }}
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

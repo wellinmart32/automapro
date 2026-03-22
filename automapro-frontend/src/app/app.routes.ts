@@ -81,6 +81,10 @@ export const routes: Routes = [
         redirectTo: 'mis-apps'
       },
       {
+        path: 'perfil',
+        loadComponent: () => import('./features/cliente/perfil/perfil').then(m => m.Perfil)
+      },
+      {
         path: 'comprar',
         loadComponent: () => import('./features/cliente/comprar/comprar').then(m => m.Comprar)
       },
