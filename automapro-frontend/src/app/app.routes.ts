@@ -34,6 +34,18 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/registro/registro').then(m => m.Registro)
   },
 
+  // Recuperar contraseña (pública)
+  {
+    path: 'recuperar-password',
+    loadComponent: () => import('./features/auth/recuperar-password/recuperar-password').then(m => m.RecuperarPassword)
+  },
+
+  // Restablecer contraseña (pública)
+  {
+    path: 'reset-password',
+    loadComponent: () => import('./features/auth/restablecer-password/restablecer-password').then(m => m.RestablecerPassword)
+  },
+
   // Rutas de administrador (protegidas con authGuard y adminGuard)
   {
     path: 'admin',
