@@ -128,8 +128,8 @@
             </a>
           </div>
 
-          <!-- Tiene licencia TRIAL -->
-          <div *ngIf="licenciaExistente && licenciaExistente.tipoLicencia === 'TRIAL'">
+          <!-- Tiene licencia TRIAL vigente -->
+          <div *ngIf="licenciaExistente && licenciaExistente.tipoLicencia === 'TRIAL' && estaVigente(licenciaExistente)">
             <div class="alert alert-info mb-3">
               <i class="bi bi-clock me-2"></i>
               <strong>Tienes el trial activo</strong><br>
@@ -142,6 +142,19 @@
             <button class="btn btn-primary btn-lg w-100 mt-2" (click)="comprarCompleta()">
               <i class="bi bi-cart-check me-2"></i>
               Comprar Versión Completa
+            </button>
+          </div>
+
+          <!-- Tiene licencia TRIAL expirada -->
+          <div *ngIf="licenciaExistente && licenciaExistente.tipoLicencia === 'TRIAL' && !estaVigente(licenciaExistente)">
+            <div class="alert alert-danger mb-3">
+              <i class="bi bi-exclamation-triangle me-2"></i>
+              <strong>Tu período de prueba ha expirado</strong><br>
+              <small>Adquiere la versión completa para seguir usando la aplicación</small>
+            </div>
+            <button class="btn btn-primary btn-lg w-100" (click)="comprarCompleta()">
+              <i class="bi bi-cart-check me-2"></i>
+              Comprar Versión Completa — {{ formatoPrecio(aplicacion.precio) }}
             </button>
           </div>
 

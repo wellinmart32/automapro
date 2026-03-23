@@ -169,6 +169,12 @@ export class DetalleAplicacion implements OnInit {
     return this.authService.estaAutenticado();
   }
 
+  estaVigente(licencia: any): boolean {
+    if (!licencia.activo) return false;
+    if (!licencia.fechaExpiracion) return true;
+    return new Date(licencia.fechaExpiracion) >= new Date();
+  }
+
   /**
    * Volver al catálogo
    */
