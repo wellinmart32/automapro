@@ -122,19 +122,24 @@ public class PublicController {
                 return ResponseEntity.ok(respuesta);
             }
 
-            // Buscar si ya existe una licencia TRIAL sin device_uuid para esta app (creada desde la web)
-            java.util.Optional<Licencia> licenciaSinDevice = licenciaRepository
-                    .findFirstByAplicacionIdAndDeviceUuidIsNullAndTipoLicencia(aplicacion.getId(), "TRIAL");
-
-            if (licenciaSinDevice.isPresent()) {
-                Licencia lic = licenciaSinDevice.get();
-                lic.setDeviceUuid(deviceUuid);
-                licenciaRepository.save(lic);
-                Map<String, Object> respuesta = new HashMap<>();
-                respuesta.put("codigo", lic.getCodigo());
-                respuesta.put("tipo", lic.getTipoLicencia());
-                respuesta.put("nueva", false);
-                return ResponseEntity.ok(respuesta);
+            // Buscar licencia existente por email del usuario (creada desde la web)
+            String emailUsuario = request.get("email");
+            if (emailUsuario != null && !emailUsuario.isBlank()) {
+                java.util.Optional<Usuario> usuarioWeb = usuarioRepository.findByEmail(emailUsuario);
+                if (usuarioWeb.isPresent()) {
+                    java.util.Optional<Licencia> licenciaWeb = licenciaRepository
+                            .findByUsuarioIdAndAplicacionId(usuarioWeb.get().getId(), aplicacion.getId());
+                    if (licenciaWeb.isPresent() && licenciaWeb.get().getDeviceUuid() == null) {
+                        Licencia lic = licenciaWeb.get();
+                        lic.setDeviceUuid(deviceUuid);
+                        licenciaRepository.save(lic);
+                        Map<String, Object> respuesta = new HashMap<>();
+                        respuesta.put("codigo", lic.getCodigo());
+                        respuesta.put("tipo", lic.getTipoLicencia());
+                        respuesta.put("nueva", false);
+                        return ResponseEntity.ok(respuesta);
+                    }
+                }
             }
 
             // Crear usuario anónimo si no existe
