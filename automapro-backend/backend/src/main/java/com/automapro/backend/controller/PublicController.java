@@ -142,17 +142,33 @@ public class PublicController {
                 }
             }
 
-            // Crear usuario anónimo si no existe
-            String emailAnonimo = "device_" + deviceUuid.substring(0, 8) + "@automapro.local";
-            Usuario usuario = usuarioRepository.findByEmail(emailAnonimo).orElseGet(() -> {
-                Usuario u = new Usuario();
-                u.setNombre("Usuario " + deviceUuid.substring(0, 8));
-                u.setEmail(emailAnonimo);
-                u.setPassword("$2a$10$disabled");
-                u.setRol("ROLE_CLIENTE");
-                u.setActivo(true);
-                return usuarioRepository.save(u);
-            });
+            // Usar usuario registrado si proporcionó email, sino crear anónimo
+            Usuario usuario;
+            if (emailUsuario != null && !emailUsuario.isBlank()) {
+                usuario = usuarioRepository.findByEmail(emailUsuario).orElseGet(() -> {
+                    String emailAnonimo = "device_" + deviceUuid.substring(0, 8) + "@automapro.local";
+                    return usuarioRepository.findByEmail(emailAnonimo).orElseGet(() -> {
+                        Usuario u = new Usuario();
+                        u.setNombre("Usuario " + deviceUuid.substring(0, 8));
+                        u.setEmail(emailAnonimo);
+                        u.setPassword("$2a$10$disabled");
+                        u.setRol("ROLE_CLIENTE");
+                        u.setActivo(true);
+                        return usuarioRepository.save(u);
+                    });
+                });
+            } else {
+                String emailAnonimo = "device_" + deviceUuid.substring(0, 8) + "@automapro.local";
+                usuario = usuarioRepository.findByEmail(emailAnonimo).orElseGet(() -> {
+                    Usuario u = new Usuario();
+                    u.setNombre("Usuario " + deviceUuid.substring(0, 8));
+                    u.setEmail(emailAnonimo);
+                    u.setPassword("$2a$10$disabled");
+                    u.setRol("ROLE_CLIENTE");
+                    u.setActivo(true);
+                    return usuarioRepository.save(u);
+                });
+            }
 
             // Crear licencia TRIAL
             String codigo = "LIC-" + java.util.UUID.randomUUID().toString().toUpperCase().substring(0, 8);
