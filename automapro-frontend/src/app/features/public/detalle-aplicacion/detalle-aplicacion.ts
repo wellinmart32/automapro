@@ -175,6 +175,16 @@ export class DetalleAplicacion implements OnInit {
     return new Date(licencia.fechaExpiracion) >= new Date();
   }
 
+  getDiasRestantes(licencia: any): number {
+    if (!licencia.fechaExpiracion) return 0;
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const expiracion = new Date(licencia.fechaExpiracion);
+    expiracion.setHours(0, 0, 0, 0);
+    const diff = Math.ceil((expiracion.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
+    return Math.max(0, diff);
+  }
+
   /**
    * Volver al catálogo
    */
