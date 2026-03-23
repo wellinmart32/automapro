@@ -91,10 +91,13 @@ export class DetalleAplicacion implements OnInit {
       error: (error) => {
         this.descargando = false;
         console.error('Error al generar licencia:', error);
-        
+
         if (error.status === 401) {
           this.mensajeError = 'Debes iniciar sesión para descargar';
           this.router.navigate(['/login']);
+        } else if (error.error === 'Ya tienes una licencia para esta aplicación') {
+          // Ya tiene licencia — recargar para mostrar botón de descarga
+          this.verificarLicenciaExistente(this.aplicacion!.id!);
         } else if (error.error && typeof error.error === 'string') {
           this.mensajeError = error.error;
         } else {
