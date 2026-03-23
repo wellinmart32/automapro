@@ -122,6 +122,36 @@ public class PublicController {
                 return ResponseEntity.ok(respuesta);
             }
 
+            // Buscar si ya existe una licencia TRIAL sin device_uuid para esta app (creada desde la web)
+            java.util.Optional<Licencia> licenciaSinDevice = licenciaRepository
+                    .findFirstByAplicacionIdAndDeviceUuidIsNullAndTipoLicencia(aplicacion.getId(), "TRIAL");
+
+            if (licenciaSinDevice.isPresent()) {
+                Licencia lic = licenciaSinDevice.get();
+                lic.setDeviceUuid(deviceUuid);
+                licenciaRepository.save(lic);
+                Map<String, Object> respuesta = new HashMap<>();
+                respuesta.put("codigo", lic.getCodigo());
+                respuesta.put("tipo", lic.getTipoLicencia());
+                respuesta.put("nueva", false);
+                return ResponseEntity.ok(respuesta);
+            }
+
+            // Buscar si ya existe una licencia TRIAL sin device_uuid para esta app (creada desde la web)
+            java.util.Optional<Licencia> licenciaSinDevice = licenciaRepository
+                    .findFirstByAplicacionIdAndDeviceUuidIsNullAndTipoLicencia(aplicacion.getId(), "TRIAL");
+
+            if (licenciaSinDevice.isPresent()) {
+                Licencia lic = licenciaSinDevice.get();
+                lic.setDeviceUuid(deviceUuid);
+                licenciaRepository.save(lic);
+                Map<String, Object> respuesta = new HashMap<>();
+                respuesta.put("codigo", lic.getCodigo());
+                respuesta.put("tipo", lic.getTipoLicencia());
+                respuesta.put("nueva", false);
+                return ResponseEntity.ok(respuesta);
+            }
+
             // Crear usuario anónimo si no existe
             String emailAnonimo = "device_" + deviceUuid.substring(0, 8) + "@automapro.local";
             Usuario usuario = usuarioRepository.findByEmail(emailAnonimo).orElseGet(() -> {

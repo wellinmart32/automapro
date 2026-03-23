@@ -39,4 +39,7 @@ public interface LicenciaRepository extends JpaRepository<Licencia, Long> {
 
     // Buscar licencia FULL por email y aplicación
     Optional<Licencia> findByEmailUsuarioAndAplicacionIdAndTipoLicencia(String emailUsuario, Long aplicacionId, String tipoLicencia);
+
+    // Buscar licencia TRIAL sin device_uuid (creada desde la web) para vincular con instalación
+    Optional<Licencia> findFirstByAplicacionIdAndDeviceUuidIsNullAndTipoLicencia(Long aplicacionId, String tipoLicencia);
 }
