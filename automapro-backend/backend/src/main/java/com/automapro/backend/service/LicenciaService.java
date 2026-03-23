@@ -88,8 +88,17 @@ public class LicenciaService {
         licencia.setAplicacion(aplicacion);
         licencia.setCodigo(licenciaDTO.getCodigo() != null ? licenciaDTO.getCodigo() : generarCodigoLicencia());
         licencia.setTipoLicencia(licenciaDTO.getTipoLicencia() != null ? licenciaDTO.getTipoLicencia() : "TRIAL");
-        licencia.setDiasTrial(licenciaDTO.getDiasTrial() != null ? licenciaDTO.getDiasTrial() : aplicacion.getDiasTrial());
-        licencia.setFechaExpiracion(licenciaDTO.getFechaExpiracion());
+        int diasTrial = licenciaDTO.getDiasTrial() != null ? licenciaDTO.getDiasTrial() : (aplicacion.getDiasTrial() != null ? aplicacion.getDiasTrial() : 30);
+        licencia.setDiasTrial(diasTrial);
+
+        // Asignar fechas al crear licencia TRIAL
+        if ("TRIAL".equals(licencia.getTipoLicencia()) && licenciaDTO.getFechaExpiracion() == null) {
+            licencia.setFechaInicioUso(LocalDate.now());
+            licencia.setFechaExpiracion(LocalDate.now().plusDays(diasTrial));
+        } else {
+            licencia.setFechaExpiracion(licenciaDTO.getFechaExpiracion());
+        }
+
         licencia.setActivo(licenciaDTO.getActivo() != null ? licenciaDTO.getActivo() : true);
 
         Licencia guardada = licenciaRepository.save(licencia);
