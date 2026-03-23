@@ -194,6 +194,18 @@ public class PublicController {
     }
 
     /**
+     * Verificar si un email está registrado en AutomaPro
+     * GET /api/public/verificar-email?email=X
+     */
+    @GetMapping("/verificar-email")
+    public ResponseEntity<?> verificarEmail(@RequestParam String email) {
+        boolean existe = usuarioRepository.existsByEmail(email);
+        Map<String, Object> respuesta = new HashMap<>();
+        respuesta.put("existe", existe);
+        return ResponseEntity.ok(respuesta);
+    }
+
+    /**
      * Recuperar licencia FULL por email (para reinstalaciones)
      * GET /api/public/licencia-por-email?email=X&app=MensajesBiblicos
      */
