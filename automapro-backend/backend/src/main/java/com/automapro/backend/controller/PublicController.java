@@ -90,6 +90,117 @@ public class PublicController {
     }
 
     /**
+     * Registrar instalación — crea o recupera licencia TRIAL por UUID de dispositivo
+     * POST /api/public/registrar-instalacion
+     */
+    @PostMapping("/registrar-instalacion")
+    public ResponseEntity<?> registrarInstalacion(@RequestBody Map<String, String> request) {
+        try {
+            String deviceUuid = request.get("deviceUuid");
+            String nombreApp = request.get("nombreApp");
+
+            if (deviceUuid == null || nombreApp == null) {
+                return ResponseEntity.badRequest().body("Datos incompletos");
+            }
+
+            // Buscar la aplicación
+            Aplicacion aplicacion = aplicacionRepository
+                    .findByNombreContainingIgnoreCase(nombreApp)
+                    .stream().filter(Aplicacion::getActivo).findFirst()
+                    .orElseThrow(() -> new RuntimeException("Aplicación no encontrada"));
+
+            // Buscar licencia existente por deviceUuid
+            java.util.Optional<Licencia> licenciaExistente =
+                    licenciaRepository.findByDeviceUuidAndAplicacionId(deviceUuid, aplicacion.getId());
+
+            if (licenciaExistente.isPresent()) {
+                Licencia lic = licenciaExistente.get();
+                Map<String, Object> respuesta = new HashMap<>();
+                respuesta.put("codigo", lic.getCodigo());
+                respuesta.put("tipo", lic.getTipoLicencia());
+                respuesta.put("nueva", false);
+                return ResponseEntity.ok(respuesta);
+            }
+
+            // Crear usuario anónimo si no existe
+            String emailAnonimo = "device_" + deviceUuid.substring(0, 8) + "@automapro.local";
+            Usuario usuario = usuarioRepository.findByEmail(emailAnonimo).orElseGet(() -> {
+                Usuario u = new Usuario();
+                u.setNombre("Usuario " + deviceUuid.substring(0, 8));
+                u.setEmail(emailAnonimo);
+                u.setPassword("$2a$10$disabled");
+                u.setRol("ROLE_CLIENTE");
+                u.setActivo(true);
+                return usuarioRepository.save(u);
+            });
+
+            // Crear licencia TRIAL
+            String codigo = "LIC-" + java.util.UUID.randomUUID().toString().toUpperCase().substring(0, 8);
+            Licencia licencia = new Licencia();
+            licencia.setUsuario(usuario);
+            licencia.setAplicacion(aplicacion);
+            licencia.setCodigo(codigo);
+            licencia.setTipoLicencia("TRIAL");
+            licencia.setDiasTrial(aplicacion.getDiasTrial() != null ? aplicacion.getDiasTrial() : 30);
+            licencia.setActivo(true);
+            licencia.setDeviceUuid(deviceUuid);
+            licenciaRepository.save(licencia);
+
+            Map<String, Object> respuesta = new HashMap<>();
+            respuesta.put("codigo", codigo);
+            respuesta.put("tipo", "TRIAL");
+            respuesta.put("nueva", true);
+            return ResponseEntity.ok(respuesta);
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Recuperar licencia FULL por email (para reinstalaciones)
+     * GET /api/public/licencia-por-email?email=X&app=MensajesBiblicos
+     */
+    @GetMapping("/licencia-por-email")
+    public ResponseEntity<?> licenciaPorEmail(
+            @RequestParam String email,
+            @RequestParam String app) {
+        try {
+            Aplicacion aplicacion = aplicacionRepository
+                    .findByNombreContainingIgnoreCase(app)
+                    .stream().filter(Aplicacion::getActivo).findFirst()
+                    .orElseThrow(() -> new RuntimeException("Aplicación no encontrada"));
+
+            java.util.Optional<Licencia> licencia = licenciaRepository
+                    .findByEmailUsuarioAndAplicacionIdAndTipoLicencia(email, aplicacion.getId(), "FULL");
+
+            if (licencia.isEmpty()) {
+                // Buscar por email del usuario registrado
+                java.util.Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
+                if (usuario.isPresent()) {
+                    java.util.Optional<Licencia> lic = licenciaRepository
+                            .findByUsuarioIdAndAplicacionId(usuario.get().getId(), aplicacion.getId());
+                    if (lic.isPresent() && "FULL".equals(lic.get().getTipoLicencia())) {
+                        Map<String, Object> resp = new HashMap<>();
+                        resp.put("codigo", lic.get().getCodigo());
+                        resp.put("tipo", lic.get().getTipoLicencia());
+                        return ResponseEntity.ok(resp);
+                    }
+                }
+                return ResponseEntity.notFound().build();
+            }
+
+            Map<String, Object> respuesta = new HashMap<>();
+            respuesta.put("codigo", licencia.get().getCodigo());
+            respuesta.put("tipo", licencia.get().getTipoLicencia());
+            return ResponseEntity.ok(respuesta);
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
+    /**
      * Generar licencia TRIAL automáticamente (requiere autenticación)
      * POST /api/public/generar-licencia-trial/{aplicacionId}
      */

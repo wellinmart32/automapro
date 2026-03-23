@@ -44,6 +44,12 @@ public class Licencia {
     @Column(name = "fecha_expiracion")
     private LocalDate fechaExpiracion; // Fecha de expiración (para TRIAL o licencias anuales)
 
+    @Column(name = "device_uuid", length = 255)
+    private String deviceUuid;
+
+    @Column(name = "email_usuario", length = 255)
+    private String emailUsuario;
+
     @Column(nullable = false)
     private Boolean activo = true;
 
