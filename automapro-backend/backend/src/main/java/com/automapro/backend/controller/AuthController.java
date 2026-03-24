@@ -9,6 +9,7 @@ import com.automapro.backend.repository.PasswordResetTokenRepository;
 import com.automapro.backend.repository.UsuarioRepository;
 import com.automapro.backend.service.AuthService;
 import com.automapro.backend.service.EmailService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -98,6 +99,7 @@ public class AuthController {
      * Solicitar recuperación de contraseña
      * POST /api/auth/recuperar-password
      */
+    @Transactional
     @PostMapping("/recuperar-password")
     public ResponseEntity<?> recuperarPassword(@RequestBody Map<String, String> request) {
         try {
