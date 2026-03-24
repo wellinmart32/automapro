@@ -1,40 +1,27 @@
 package com.automapro.backend.service;
 
+import com.resend.Resend;
+import com.resend.core.exception.ResendException;
+import com.resend.services.emails.model.CreateEmailOptions;
+import com.resend.services.emails.model.CreateEmailResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import jakarta.mail.*;
-import jakarta.mail.internet.*;
-import java.util.Properties;
-
 /**
- * Servicio para envío de emails via Gmail SMTP
+ * Servicio para envío de emails via Resend
  */
 @Service
 public class EmailService {
 
-    @Value("${gmail.username}")
-    private String gmailUsername;
-
-    @Value("${gmail.app.password}")
-    private String gmailAppPassword;
+    @Value("${resend.api.key}")
+    private String resendApiKey;
 
     /**
      * Envía email de recuperación de contraseña
      */
     public void enviarEmailRecuperacion(String emailDestino, String nombre, String token) {
         try {
-            Properties props = new Properties();
-            props.put("mail.smtp.auth", "true");
-            props.put("mail.smtp.starttls.enable", "true");
-            props.put("mail.smtp.host", "smtp.gmail.com");
-            props.put("mail.smtp.port", "587");
-
-            Session session = Session.getInstance(props, new Authenticator() {
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(gmailUsername, gmailAppPassword);
-                }
-            });
+            Resend resend = new Resend(resendApiKey);
 
             String urlReset = "https://automapro-frontend.vercel.app/reset-password?token=" + token;
 
@@ -68,16 +55,17 @@ public class EmailService {
                     </div>
                     """.formatted(nombre, urlReset);
 
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(gmailUsername, "AutomaPro"));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(emailDestino));
-            message.setSubject("Recuperar contraseña - AutomaPro");
-            message.setContent(htmlContent, "text/html; charset=utf-8");
+            CreateEmailOptions params = CreateEmailOptions.builder()
+                    .from("AutomaPro <noreply@automapro.online>")
+                    .to(emailDestino)
+                    .subject("Recuperar contraseña - AutomaPro")
+                    .html(htmlContent)
+                    .build();
 
-            Transport.send(message);
-            System.out.println("✅ Email enviado a: " + emailDestino);
+            CreateEmailResponse response = resend.emails().send(params);
+            System.out.println("✅ Email enviado: " + response.getId());
 
-        } catch (Exception e) {
+        } catch (ResendException e) {
             System.err.println("❌ Error enviando email: " + e.getMessage());
             throw new RuntimeException("Error al enviar email: " + e.getMessage());
         }
