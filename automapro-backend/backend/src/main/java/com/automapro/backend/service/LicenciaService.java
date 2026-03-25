@@ -153,7 +153,8 @@ public class LicenciaService {
      * Generar código único de licencia
      */
     private String generarCodigoLicencia() {
-        return "LIC-" + UUID.randomUUID().toString().toUpperCase().substring(0, 8);
+        String uuid = UUID.randomUUID().toString().toUpperCase().replace("-", "");
+        return "LIC-" + uuid.substring(0, 6) + "-" + uuid.substring(6, 11);
     }
 
     /**
