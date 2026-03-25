@@ -7,13 +7,13 @@ import { CONSTANTES } from '../config/constantes';
 
 /**
  * Interceptor para agregar el token JWT a todas las peticiones HTTP
+ * y manejar sesiones expiradas redirigiendo al login
  */
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(Auth);
   const router = inject(Router);
   const token = authService.getToken();
 
-  // Clonar la petición y agregar el header de autorización si existe el token
   if (token) {
     req = req.clone({
       setHeaders: {
@@ -22,16 +22,20 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
     });
   }
 
-  // Manejar la respuesta y capturar errores
   return next(req).pipe(
     catchError((error) => {
-      // Si es error 401 (no autorizado), cerrar sesión y redirigir al login
       if (error.status === 401) {
+        // Guardar URL actual para redirigir después del login
+        const urlActual = router.url;
+        if (urlActual && urlActual !== '/login') {
+          localStorage.setItem('returnUrl', urlActual);
+        }
         authService.logout();
-        router.navigate(['/login']);
+        router.navigate(['/login'], {
+          queryParams: { sesionExpirada: 'true' }
+        });
       }
 
-      // Si es error 403 (sin permisos)
       if (error.status === 403) {
         console.error(CONSTANTES.MENSAJES.SIN_PERMISOS);
       }

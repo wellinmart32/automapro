@@ -24,6 +24,7 @@ export class Login {
   mensajeError = '';
 
   returnUrl: string = '/cliente/tablero';
+  sesionExpirada: boolean = false;
 
   constructor(
     private authService: Auth,
@@ -33,6 +34,9 @@ export class Login {
     this.route.queryParams.subscribe(params => {
       if (params['returnUrl']) {
         this.returnUrl = params['returnUrl'];
+      }
+      if (params['sesionExpirada'] === 'true') {
+        this.sesionExpirada = true;
       }
     });
   }

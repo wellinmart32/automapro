@@ -13,6 +13,12 @@
             <p class="text-muted">Iniciar Sesión</p>
           </div>
 
+          <!-- Alerta de sesión expirada -->
+          <div class="alert alert-warning" role="alert" *ngIf="sesionExpirada">
+            <i class="bi bi-clock me-2"></i>
+            Tu sesión ha expirado. Inicia sesión para continuar.
+          </div>
+
           <!-- Alerta de error -->
           <div class="alert alert-danger alert-dismissible fade show" role="alert" *ngIf="mensajeError">
             <i class="bi bi-exclamation-triangle me-2"></i>
