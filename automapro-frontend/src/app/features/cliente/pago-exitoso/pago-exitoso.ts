@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-pago-exitoso',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './pago-exitoso.html',
   styleUrl: './pago-exitoso.scss'
 })
