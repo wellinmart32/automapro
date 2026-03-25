@@ -194,14 +194,80 @@ public class PublicController {
     }
 
     /**
-     * Verificar si un email está registrado en AutomaPro
+     * Verificar si un email está registrado y obtener estado de licencia
      * GET /api/public/verificar-email?email=X
      */
     @GetMapping("/verificar-email")
     public ResponseEntity<?> verificarEmail(@RequestParam String email) {
-        boolean existe = usuarioRepository.existsByEmail(email);
         Map<String, Object> respuesta = new HashMap<>();
-        respuesta.put("existe", existe);
+        
+        java.util.Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
+        if (!usuarioOpt.isPresent()) {
+            respuesta.put("existe", false);
+            return ResponseEntity.ok(respuesta);
+        }
+
+        respuesta.put("existe", true);
+        Usuario usuario = usuarioOpt.get();
+
+        // Buscar licencia del usuario
+        java.util.List<com.automapro.backend.entity.Licencia> licencias = 
+            licenciaRepository.findByUsuarioId(usuario.getId());
+
+        if (licencias.isEmpty()) {
+            respuesta.put("tipoLicencia", "NINGUNA");
+            return ResponseEntity.ok(respuesta);
+        }
+
+        com.automapro.backend.entity.Licencia licencia = licencias.get(0);
+        respuesta.put("tipoLicencia", licencia.getTipoLicencia());
+        respuesta.put("codigo", licencia.getCodigo());
+
+        if ("TRIAL".equals(licencia.getTipoLicencia()) && licencia.getFechaExpiracion() != null) {
+            long diasRestantes = java.time.temporal.ChronoUnit.DAYS.between(
+                java.time.LocalDate.now(), licencia.getFechaExpiracion());
+            respuesta.put("diasRestantes", Math.max(0, diasRestantes));
+            respuesta.put("expirado", diasRestantes <= 0);
+        }
+
+        return ResponseEntity.ok(respuesta);
+    }
+
+    /**
+     * Verificar si un código pertenece a un email específico
+     * GET /api/public/verificar-licencia-email?email=X&codigo=Y
+     */
+    @GetMapping("/verificar-licencia-email")
+    public ResponseEntity<?> verificarLicenciaEmail(
+            @RequestParam String email,
+            @RequestParam String codigo) {
+        Map<String, Object> respuesta = new HashMap<>();
+
+        java.util.Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
+        if (!usuarioOpt.isPresent()) {
+            respuesta.put("valida", false);
+            respuesta.put("mensaje", "Email no registrado");
+            return ResponseEntity.ok(respuesta);
+        }
+
+        java.util.Optional<com.automapro.backend.entity.Licencia> licenciaOpt = 
+            licenciaRepository.findByCodigo(codigo);
+
+        if (!licenciaOpt.isPresent()) {
+            respuesta.put("valida", false);
+            respuesta.put("mensaje", "Código no encontrado");
+            return ResponseEntity.ok(respuesta);
+        }
+
+        com.automapro.backend.entity.Licencia licencia = licenciaOpt.get();
+        if (!licencia.getUsuario().getId().equals(usuarioOpt.get().getId())) {
+            respuesta.put("valida", false);
+            respuesta.put("mensaje", "Este código no pertenece a tu cuenta");
+            return ResponseEntity.ok(respuesta);
+        }
+
+        respuesta.put("valida", true);
+        respuesta.put("tipo", licencia.getTipoLicencia());
         return ResponseEntity.ok(respuesta);
     }
 
