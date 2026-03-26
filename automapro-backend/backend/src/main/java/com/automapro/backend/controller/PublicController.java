@@ -198,9 +198,10 @@ public class PublicController {
      * GET /api/public/verificar-email?email=X
      */
     @GetMapping("/verificar-email")
-    public ResponseEntity<?> verificarEmail(@RequestParam String email) {
+    public ResponseEntity<?> verificarEmail(@RequestParam String email,
+                                             @RequestParam(required = false) String nombreApp) {
         Map<String, Object> respuesta = new HashMap<>();
-        
+
         java.util.Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
         if (!usuarioOpt.isPresent()) {
             respuesta.put("existe", false);
@@ -210,8 +211,8 @@ public class PublicController {
         respuesta.put("existe", true);
         Usuario usuario = usuarioOpt.get();
 
-        // Buscar licencia del usuario
-        java.util.List<com.automapro.backend.entity.Licencia> licencias = 
+        // Buscar licencias del usuario
+        java.util.List<com.automapro.backend.entity.Licencia> licencias =
             licenciaRepository.findByUsuarioId(usuario.getId());
 
         if (licencias.isEmpty()) {
@@ -219,7 +220,23 @@ public class PublicController {
             return ResponseEntity.ok(respuesta);
         }
 
-        com.automapro.backend.entity.Licencia licencia = licencias.get(0);
+        // Filtrar por app si se especifica nombreApp
+        com.automapro.backend.entity.Licencia licencia = null;
+        if (nombreApp != null && !nombreApp.isEmpty()) {
+            licencia = licencias.stream()
+                .filter(l -> l.getAplicacion() != null &&
+                             nombreApp.equalsIgnoreCase(l.getAplicacion().getNombre()))
+                .findFirst()
+                .orElse(null);
+        } else {
+            licencia = licencias.get(0);
+        }
+
+        if (licencia == null) {
+            respuesta.put("tipoLicencia", "NINGUNA");
+            return ResponseEntity.ok(respuesta);
+        }
+
         respuesta.put("tipoLicencia", licencia.getTipoLicencia());
         respuesta.put("codigo", licencia.getCodigo());
 
