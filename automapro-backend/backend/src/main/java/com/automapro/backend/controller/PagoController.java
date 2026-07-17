@@ -1,6 +1,8 @@
 package com.automapro.backend.controller;
 
+import com.automapro.backend.entity.Aplicacion;
 import com.automapro.backend.entity.Licencia;
+import com.automapro.backend.repository.AplicacionRepository;
 import com.automapro.backend.repository.LicenciaRepository;
 import com.automapro.backend.service.LicenciaService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,9 +23,8 @@ public class PagoController {
     @Value("${hotmart.hottok:}")
     private String hotmartHottok;
 
-    // Mapeo de productos de Hotmart a aplicaciones: "productoHotmartId:aplicacionId,productoHotmartId:aplicacionId"
-    @Value("${hotmart.mapeo.productos:}")
-    private String hotmartMapeoProductos;
+    @Autowired
+    private AplicacionRepository aplicacionRepository;
 
     @Autowired
     private LicenciaRepository licenciaRepository;
@@ -66,18 +67,19 @@ public class PagoController {
 
             // 3. Extraer datos del comprador y del producto
             String emailComprador = evento.path("data").path("buyer").path("email").asText();
-            Long productoHotmartId = evento.path("data").path("product").path("id").asLong();
+            String productoHotmartId = evento.path("data").path("product").path("id").asText();
 
             System.out.println("Compra Hotmart aprobada - Email: " + emailComprador
                     + " - Producto Hotmart: " + productoHotmartId);
 
-            // 4. Mapear el producto de Hotmart a nuestra aplicación
-            Long aplicacionId = resolverAplicacionId(productoHotmartId);
-            if (aplicacionId == null) {
+            // 4. Mapear el producto de Hotmart a nuestra aplicación (columna hotmart_product_id)
+            Optional<Aplicacion> aplicacionOpt = aplicacionRepository.findByHotmartProductId(productoHotmartId);
+            if (aplicacionOpt.isEmpty()) {
                 System.err.println("Webhook Hotmart: el producto " + productoHotmartId
                         + " no está mapeado a ninguna aplicación");
                 return ResponseEntity.ok().build();
             }
+            Long aplicacionId = aplicacionOpt.get().getId();
 
             // 5. Buscar la licencia del usuario por su correo y convertirla a FULL
             Optional<Licencia> licenciaOpt = licenciaRepository
@@ -107,30 +109,5 @@ public class PagoController {
             System.err.println("Error procesando webhook de Hotmart: " + e.getMessage());
             return ResponseEntity.badRequest().build();
         }
-    }
-
-    /**
-     * Resuelve el ID de nuestra aplicación a partir del ID de producto de Hotmart,
-     * usando el mapeo configurado ("productoHotmartId:aplicacionId,...").
-     */
-    private Long resolverAplicacionId(Long productoHotmartId) {
-        if (hotmartMapeoProductos == null || hotmartMapeoProductos.isBlank()) {
-            return null;
-        }
-        for (String par : hotmartMapeoProductos.split(",")) {
-            String[] partes = par.trim().split(":");
-            if (partes.length == 2) {
-                try {
-                    Long idProducto = Long.parseLong(partes[0].trim());
-                    Long idAplicacion = Long.parseLong(partes[1].trim());
-                    if (idProducto.equals(productoHotmartId)) {
-                        return idAplicacion;
-                    }
-                } catch (NumberFormatException ignored) {
-                    // Par mal formado, se ignora
-                }
-            }
-        }
-        return null;
     }
 }
