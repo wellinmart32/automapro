@@ -2,219 +2,135 @@ package com.automapro.backend.controller;
 
 import com.automapro.backend.entity.Licencia;
 import com.automapro.backend.repository.LicenciaRepository;
-import com.automapro.backend.repository.UsuarioRepository;
-import com.automapro.backend.repository.AplicacionRepository;
 import com.automapro.backend.service.LicenciaService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/pagos")
 @CrossOrigin(origins = "${cors.origenes.permitidos}")
 public class PagoController {
 
-    @Value("${lemonsqueezy.api.key}")
-    private String lsApiKey;
+    // Token de verificación único de tu cuenta de Hotmart (Hottok)
+    @Value("${hotmart.hottok:}")
+    private String hotmartHottok;
 
-    @Value("${lemonsqueezy.webhook.secret}")
-    private String lsWebhookSecret;
-
-    @Value("${lemonsqueezy.variant.id}")
-    private String lsVariantId;
-
-    @Value("${lemonsqueezy.store.id}")
-    private String lsStoreId;
-
-    @Autowired
-    private AplicacionRepository aplicacionRepository;
+    // Mapeo de productos de Hotmart a aplicaciones: "productoHotmartId:aplicacionId,productoHotmartId:aplicacionId"
+    @Value("${hotmart.mapeo.productos:}")
+    private String hotmartMapeoProductos;
 
     @Autowired
     private LicenciaRepository licenciaRepository;
 
     @Autowired
-    private UsuarioRepository usuarioRepository;
-
-    @Autowired
     private LicenciaService licenciaService;
 
-    private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
-     * Crear checkout en Lemon Squeezy
-     */
-    @PostMapping("/crear-checkout")
-    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
-    public ResponseEntity<?> crearCheckout(@RequestBody Map<String, Long> request) {
-        try {
-            // Obtener usuario autenticado
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String email = authentication.getName();
-
-            Long aplicacionId = request.get("aplicacionId");
-
-            // Buscar licencia TRIAL del usuario
-            Licencia licencia = licenciaRepository
-                    .findByUsuarioEmailAndAplicacionId(email, aplicacionId)
-                    .orElse(null);
-
-            // Construir body del checkout
-            Map<String, Object> checkoutData = new HashMap<>();
-            Map<String, Object> data = new HashMap<>();
-            Map<String, Object> attributes = new HashMap<>();
-            Map<String, Object> relationships = new HashMap<>();
-            Map<String, Object> variant = new HashMap<>();
-            Map<String, Object> variantData = new HashMap<>();
-            Map<String, Object> checkoutOptions = new HashMap<>();
-            Map<String, Object> checkoutData2 = new HashMap<>();
-            Map<String, Object> custom = new HashMap<>();
-            Map<String, Object> productOptions = new HashMap<>();
-
-            // Metadata para identificar la licencia
-            custom.put("licenciaId", licencia != null ? licencia.getId().toString() : "nueva");
-            custom.put("aplicacionId", aplicacionId.toString());
-            custom.put("usuarioEmail", email);
-
-            checkoutData2.put("custom", custom);
-            productOptions.put("redirect_url", "https://automapro-frontend.vercel.app/cliente/pago-exitoso");
-            attributes.put("product_options", productOptions);
-            attributes.put("checkout_data", checkoutData2);
-            attributes.put("expires_at", (Object) null);
-
-            variantData.put("type", "variants");
-            variantData.put("id", lsVariantId);
-            variant.put("data", variantData);
-            relationships.put("variant", variant);
-
-            Map<String, Object> store = new HashMap<>();
-            Map<String, Object> storeData = new HashMap<>();
-            storeData.put("type", "stores");
-            storeData.put("id", lsStoreId);
-            store.put("data", storeData);
-            relationships.put("store", store);
-
-            data.put("type", "checkouts");
-            data.put("attributes", attributes);
-            data.put("relationships", relationships);
-            checkoutData.put("data", data);
-
-            // Llamar a la API de Lemon Squeezy
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + lsApiKey);
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("Accept", "application/vnd.api+json");
-
-            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(checkoutData, headers);
-
-            ResponseEntity<String> lsResponse = restTemplate.exchange(
-                    "https://api.lemonsqueezy.com/v1/checkouts",
-                    HttpMethod.POST,
-                    entity,
-                    String.class
-            );
-
-            // Extraer URL del checkout
-            JsonNode responseNode = objectMapper.readTree(lsResponse.getBody());
-            String checkoutUrl = responseNode
-                    .path("data")
-                    .path("attributes")
-                    .path("url")
-                    .asText();
-
-            Map<String, String> response = new HashMap<>();
-            response.put("checkoutUrl", checkoutUrl);
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            System.err.println("Error creando checkout Lemon Squeezy: " + e.getMessage());
-            Map<String, String> error = new HashMap<>();
-            error.put("error", "Error al crear sesión de pago: " + e.getMessage());
-            return ResponseEntity.badRequest().body(error);
-        }
-    }
-
-    /**
-     * Webhook para recibir eventos de Lemon Squeezy
+     * Webhook para recibir eventos de compra de Hotmart
+     * POST /api/pagos/webhook
      */
     @PostMapping("/webhook")
-    public ResponseEntity<?> webhookLemonSqueezy(
+    public ResponseEntity<?> webhookHotmart(
             @RequestBody String payload,
-            @RequestHeader("X-Signature") String signature) {
+            @RequestHeader(value = "X-HOTMART-HOTTOK", required = false) String hottokHeader) {
         try {
-            // Verificar firma del webhook
-            if (!verificarFirma(payload, signature)) {
-                System.err.println("Firma de webhook inválida");
+            JsonNode evento = objectMapper.readTree(payload);
+
+            // 1. Validar el Hottok (viene en el header y, como respaldo, en el cuerpo)
+            String hottokRecibido = hottokHeader;
+            if (hottokRecibido == null || hottokRecibido.isBlank()) {
+                hottokRecibido = evento.path("hottok").asText(null);
+            }
+            if (hotmartHottok == null || hotmartHottok.isBlank()
+                    || hottokRecibido == null || !hotmartHottok.equals(hottokRecibido)) {
+                System.err.println("Webhook Hotmart: Hottok inválido o ausente");
                 return ResponseEntity.status(401).build();
             }
 
-            JsonNode event = objectMapper.readTree(payload);
-            String eventName = event.path("meta").path("event_name").asText();
+            // 2. Procesar solo compras aprobadas
+            String nombreEvento = evento.path("event").asText();
+            String estado = evento.path("data").path("purchase").path("status").asText();
 
-            // Procesar solo order_created
-            if ("order_created".equals(eventName)) {
-                JsonNode meta = event.path("meta");
-                JsonNode customData = meta.path("custom_data");
-
-                String licenciaIdStr = customData.path("licenciaId").asText();
-                String usuarioEmail = customData.path("usuarioEmail").asText();
-                String aplicacionIdStr = customData.path("aplicacionId").asText();
-
-                System.out.println("Pago recibido - Email: " + usuarioEmail + " - Licencia: " + licenciaIdStr);
-
-                // Convertir licencia TRIAL a FULL si existe
-                if (licenciaIdStr != null && !"nueva".equals(licenciaIdStr)) {
-                    Long licenciaId = Long.parseLong(licenciaIdStr);
-                    licenciaService.convertirAFull(licenciaId);
-                    System.out.println("Licencia " + licenciaId + " convertida a FULL");
-                }
+            if (!"PURCHASE_APPROVED".equals(nombreEvento) && !"APPROVED".equalsIgnoreCase(estado)) {
+                System.out.println("Webhook Hotmart: evento ignorado (" + nombreEvento + " / " + estado + ")");
+                return ResponseEntity.ok().build();
             }
+
+            // 3. Extraer datos del comprador y del producto
+            String emailComprador = evento.path("data").path("buyer").path("email").asText();
+            Long productoHotmartId = evento.path("data").path("product").path("id").asLong();
+
+            System.out.println("Compra Hotmart aprobada - Email: " + emailComprador
+                    + " - Producto Hotmart: " + productoHotmartId);
+
+            // 4. Mapear el producto de Hotmart a nuestra aplicación
+            Long aplicacionId = resolverAplicacionId(productoHotmartId);
+            if (aplicacionId == null) {
+                System.err.println("Webhook Hotmart: el producto " + productoHotmartId
+                        + " no está mapeado a ninguna aplicación");
+                return ResponseEntity.ok().build();
+            }
+
+            // 5. Buscar la licencia del usuario por su correo y convertirla a FULL
+            Optional<Licencia> licenciaOpt = licenciaRepository
+                    .findByUsuarioEmailAndAplicacionId(emailComprador, aplicacionId);
+
+            if (licenciaOpt.isEmpty()) {
+                System.err.println("Webhook Hotmart: no se encontró licencia para " + emailComprador
+                        + " en la aplicación " + aplicacionId + " (compra sin cuenta/trial previo)");
+                return ResponseEntity.ok().build();
+            }
+
+            Licencia licencia = licenciaOpt.get();
+
+            // Idempotencia: si ya es FULL, no hacer nada (Hotmart reintenta hasta 5 veces)
+            if ("FULL".equals(licencia.getTipoLicencia())) {
+                System.out.println("Webhook Hotmart: la licencia " + licencia.getId()
+                        + " ya era FULL, no se hace nada");
+                return ResponseEntity.ok().build();
+            }
+
+            licenciaService.convertirAFull(licencia.getId());
+            System.out.println("Webhook Hotmart: licencia " + licencia.getId() + " convertida a FULL");
 
             return ResponseEntity.ok().build();
 
         } catch (Exception e) {
-            System.err.println("Error procesando webhook: " + e.getMessage());
+            System.err.println("Error procesando webhook de Hotmart: " + e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
 
     /**
-     * Verificar firma HMAC del webhook de Lemon Squeezy
+     * Resuelve el ID de nuestra aplicación a partir del ID de producto de Hotmart,
+     * usando el mapeo configurado ("productoHotmartId:aplicacionId,...").
      */
-    private boolean verificarFirma(String payload, String signature) {
-        try {
-            Mac mac = Mac.getInstance("HmacSHA256");
-            SecretKeySpec secretKey = new SecretKeySpec(
-                    lsWebhookSecret.getBytes(StandardCharsets.UTF_8),
-                    "HmacSHA256"
-            );
-            mac.init(secretKey);
-            byte[] hash = mac.doFinal(payload.getBytes(StandardCharsets.UTF_8));
-
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : hash) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) hexString.append('0');
-                hexString.append(hex);
-            }
-
-            return hexString.toString().equals(signature);
-        } catch (Exception e) {
-            System.err.println("Error verificando firma: " + e.getMessage());
-            return false;
+    private Long resolverAplicacionId(Long productoHotmartId) {
+        if (hotmartMapeoProductos == null || hotmartMapeoProductos.isBlank()) {
+            return null;
         }
+        for (String par : hotmartMapeoProductos.split(",")) {
+            String[] partes = par.trim().split(":");
+            if (partes.length == 2) {
+                try {
+                    Long idProducto = Long.parseLong(partes[0].trim());
+                    Long idAplicacion = Long.parseLong(partes[1].trim());
+                    if (idProducto.equals(productoHotmartId)) {
+                        return idAplicacion;
+                    }
+                } catch (NumberFormatException ignored) {
+                    // Par mal formado, se ignora
+                }
+            }
+        }
+        return null;
     }
 }

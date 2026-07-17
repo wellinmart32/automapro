@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/api/archivos/descargar/**").permitAll()
                         .requestMatchers("/api/pagos/webhook").permitAll()
+                        .requestMatchers("/api/pagos/webhook-hotmart").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/cliente/**").hasAnyRole("ADMIN", "CLIENTE")
                         .anyRequest().authenticated()

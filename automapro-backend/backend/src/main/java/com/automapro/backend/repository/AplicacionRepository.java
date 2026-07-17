@@ -19,4 +19,7 @@ public interface AplicacionRepository extends JpaRepository<Aplicacion, Long> {
     
     // Buscar aplicación por nombre exacto
     boolean existsByNombre(String nombre);
+
+    // Buscar aplicación por ID de producto en Hotmart (para el webhook)
+    java.util.Optional<Aplicacion> findByHotmartProductId(String hotmartProductId);
 }

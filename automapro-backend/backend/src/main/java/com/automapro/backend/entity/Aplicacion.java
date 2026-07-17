@@ -42,6 +42,9 @@ public class Aplicacion {
     @Column(name = "dias_trial")
     private Integer diasTrial; // Días de período de prueba (null = sin trial, 0 = sin límite)
 
+    @Column(name = "hotmart_product_id", length = 50)
+    private String hotmartProductId; // ID del producto en Hotmart, para matchear el webhook
+
     @Column(nullable = false)
     private Boolean activo = true;
 

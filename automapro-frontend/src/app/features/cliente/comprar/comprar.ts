@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { AplicacionService } from '../../../core/services/aplicacion';
 import { Aplicacion } from '../../../core/models/aplicacion.model';
-import { API_CONFIG } from '../../../core/config/api.config';
+import { Auth } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-comprar',
@@ -15,17 +14,23 @@ import { API_CONFIG } from '../../../core/config/api.config';
 export class Comprar implements OnInit {
   aplicacion: Aplicacion | null = null;
   codigoLicencia: string = '';
-  
+
   // Estados
   cargando = false;
   procesandoPago = false;
   mensajeError = '';
 
+  // Enlaces de pago de Hotmart por aplicación (aplicacionId -> URL de checkout)
+  private readonly urlsPagoHotmart: { [aplicacionId: number]: string } = {
+    1: 'PENDIENTE_URL_HOTMART_MENSAJESBIBLICOS',
+    2: 'PENDIENTE_URL_HOTMART_PUBLICADORREDES'
+  };
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private http: HttpClient,
-    private aplicacionService: AplicacionService
+    private aplicacionService: AplicacionService,
+    private authService: Auth
   ) {}
 
   ngOnInit(): void {
@@ -33,7 +38,7 @@ export class Comprar implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.codigoLicencia = params['codigo'] || '';
       const appId = params['app'];
-      
+
       if (appId) {
         this.cargarAplicacion(+appId);
       } else {
@@ -61,34 +66,30 @@ export class Comprar implements OnInit {
   }
 
   /**
-   * Iniciar proceso de pago con Stripe
+   * Iniciar proceso de pago con Hotmart
    */
   iniciarPago(): void {
     if (!this.aplicacion || !this.aplicacion.id) {
       return;
     }
 
+    const urlPago = this.urlsPagoHotmart[this.aplicacion.id];
+    if (!urlPago || urlPago.startsWith('PENDIENTE_')) {
+      this.mensajeError = 'El enlace de pago aún no está configurado para esta aplicación';
+      return;
+    }
+
     this.procesandoPago = true;
     this.mensajeError = '';
 
-    const url = `${API_CONFIG.baseUrl}/api/pagos/crear-checkout`;
-    const body = { aplicacionId: this.aplicacion.id };
+    // Pre-llenar el correo del usuario para que la compra se asocie a su cuenta
+    const email = this.authService.getUsuarioActual()?.email;
+    const urlFinal = email
+      ? `${urlPago}?email=${encodeURIComponent(email)}`
+      : urlPago;
 
-    this.http.post<any>(url, body).subscribe({
-      next: (response) => {
-        if (response.checkoutUrl) {
-          window.location.href = response.checkoutUrl;
-        } else {
-          this.mensajeError = 'Error al obtener URL de pago';
-          this.procesandoPago = false;
-        }
-      },
-      error: (error) => {
-        console.error('Error al crear checkout:', error);
-        this.mensajeError = error.error?.error || 'Error al iniciar el proceso de pago';
-        this.procesandoPago = false;
-      }
-    });
+    // Redirigir al checkout de Hotmart
+    window.location.href = urlFinal;
   }
 
   /**
