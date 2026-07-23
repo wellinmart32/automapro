@@ -22,7 +22,7 @@ export class Comprar implements OnInit {
 
   // Enlaces de pago de Hotmart por aplicación (aplicacionId -> URL de checkout)
   private readonly urlsPagoHotmart: { [aplicacionId: number]: string } = {
-    1: 'PENDIENTE_URL_HOTMART_MENSAJESBIBLICOS',
+    1: 'https://pay.hotmart.com/I106736006K',
     2: 'PENDIENTE_URL_HOTMART_PUBLICADORREDES'
   };
 
