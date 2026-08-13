@@ -58,6 +58,9 @@ spring-output/
 application-local.properties
 **/application-local.properties
 **/src/main/resources/application-local.properties
+application.properties
+**/application.properties
+**/src/main/resources/application.properties
 
 # Carpeta de instaladores (archivos grandes)
 instaladores/

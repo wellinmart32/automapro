@@ -70,4 +70,62 @@ public class EmailService {
             throw new RuntimeException("Error al enviar email: " + e.getMessage());
         }
     }
+
+    /**
+     * Envía email con el código de licencia tras una compra aprobada en Hotmart
+     */
+    public void enviarEmailLicencia(String emailDestino, String nombreComprador, String nombreAplicacion,
+                                     String codigoLicencia, String urlDescarga) {
+        try {
+            Resend resend = new Resend(resendApiKey);
+
+            String htmlContent = """
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                        <div style="background-color: #0d6efd; padding: 30px; text-align: center;">
+                            <h1 style="color: white; margin: 0;">AutomaPro</h1>
+                        </div>
+                        <div style="padding: 30px; background-color: #f8f9fa;">
+                            <h2 style="color: #333;">¡Gracias por tu compra!</h2>
+                            <p>Hola <strong>%s</strong>,</p>
+                            <p>Tu licencia completa de <strong>%s</strong> ya está activa. Este es tu código de licencia:</p>
+                            <div style="text-align: center; margin: 30px 0;">
+                                <span style="display: inline-block; background-color: #ffffff; border: 2px dashed #0d6efd;
+                                             color: #0d6efd; padding: 14px 28px; border-radius: 6px;
+                                             font-weight: bold; font-size: 18px; letter-spacing: 1px;">
+                                    %s
+                                </span>
+                            </div>
+                            <p>Si necesitas reinstalar la aplicación, descárgala aquí:</p>
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="%s"
+                                   style="background-color: #0d6efd; color: white; padding: 14px 28px;
+                                          text-decoration: none; border-radius: 6px; font-weight: bold;">
+                                    Descargar Instalador
+                                </a>
+                            </div>
+                            <p style="color: #666; font-size: 14px;">
+                                Guarda este correo, es tu comprobante permanente de la compra y tu código de licencia.
+                            </p>
+                        </div>
+                        <div style="padding: 20px; text-align: center; color: #999; font-size: 12px;">
+                            © 2026 AutomaPro — Sistema de Automatización
+                        </div>
+                    </div>
+                    """.formatted(nombreComprador, nombreAplicacion, codigoLicencia, urlDescarga);
+
+            CreateEmailOptions params = CreateEmailOptions.builder()
+                    .from("AutomaPro <noreply@automapro.online>")
+                    .to(emailDestino)
+                    .subject("Tu licencia de " + nombreAplicacion + " - AutomaPro")
+                    .html(htmlContent)
+                    .build();
+
+            CreateEmailResponse response = resend.emails().send(params);
+            System.out.println("✅ Email de licencia enviado: " + response.getId());
+
+        } catch (ResendException e) {
+            System.err.println("❌ Error enviando email de licencia: " + e.getMessage());
+            throw new RuntimeException("Error al enviar email de licencia: " + e.getMessage());
+        }
+    }
 }

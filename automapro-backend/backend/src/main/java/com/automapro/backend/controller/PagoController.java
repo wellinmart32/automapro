@@ -5,6 +5,7 @@ import com.automapro.backend.entity.Licencia;
 import com.automapro.backend.repository.AplicacionRepository;
 import com.automapro.backend.repository.LicenciaRepository;
 import com.automapro.backend.service.LicenciaService;
+import com.automapro.backend.service.EmailService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class PagoController {
 
     @Autowired
     private LicenciaService licenciaService;
+
+    @Autowired
+    private EmailService emailService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -102,6 +106,19 @@ public class PagoController {
 
             licenciaService.convertirAFull(licencia.getId());
             System.out.println("Webhook Hotmart: licencia " + licencia.getId() + " convertida a FULL");
+
+            // 6. Enviar email con el código de licencia
+            try {
+                String nombreComprador = evento.path("data").path("buyer").path("name").asText("Cliente");
+                String nombreAplicacion = aplicacionOpt.get().getNombre();
+                String urlDescarga = "https://automapro-backend.onrender.com/api/archivos/descargar/" + aplicacionId;
+
+                emailService.enviarEmailLicencia(emailComprador, nombreComprador, nombreAplicacion,
+                        licencia.getCodigo(), urlDescarga);
+                System.out.println("Webhook Hotmart: email de licencia enviado a " + emailComprador);
+            } catch (Exception emailEx) {
+                System.err.println("Webhook Hotmart: error enviando email de licencia: " + emailEx.getMessage());
+            }
 
             return ResponseEntity.ok().build();
 
