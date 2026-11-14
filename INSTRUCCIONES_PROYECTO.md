@@ -122,14 +122,25 @@ Antes de crear cualquier archivo:
 
 ## CAMBIO DE MODELO
 Usar el modelo adecuado según el tipo de trabajo:
-- **Opus**: diseñar (arquitectura, nuevas funcionalidades, decisiones) y depurar errores difíciles
+- **Opus**: diseñar (arquitectura, nuevas funcionalidades, decisiones), revisar, probar y depurar errores
 - **Sonnet**: código mecánico (aplicar un diseño ya decidido, scripts de cambios, ajustes repetitivos)
 - **Haiku**: cambios mínimos (un texto, un valor, un comando suelto)
 
-Cuando el siguiente paso conviene hacerlo con otro modelo, avisarlo en el MISMO mensaje del paso,
-al inicio y bien visible, así:
+Reglas:
+1. Al empezar un chat, indicar el modelo recomendado para lo que viene (normalmente Opus).
+2. En CADA mensaje, revisar qué modelo está usando el usuario (el sistema avisa cuando cambia con /model):
+   - Si es el adecuado para el siguiente paso, indicarlo al inicio: "✅ MODELO → X (correcto, sigue)".
+   - Si no lo es, decir cuál se está usando, cuál conviene y preguntar "¿Te parece bien cambiar?".
+     Si el usuario dice que sí, esperar a que cambie. Si dice que no, continuar con el modelo actual sin insistir.
+3. ANTES de programar (script aplicar_X_Y_Z.py o Buscar → Reemplazar), NO leer el código ni generar nada todavía.
+   Primero mandar un mensaje corto con: qué se va a programar, el aviso de modelo y la pregunta "¿Continúo?".
+   Esperar la confirmación del usuario y recién entonces programar.
+   Excepción: si el usuario dice que no revise el modelo, continuar sin preguntar.
+4. Al terminar de programar, si lo siguiente es probar, revisar o diseñar, avisar que vuelva al modelo correspondiente.
+5. El aviso va al inicio del mensaje, bien visible, con el nombre del modelo en un bloque copiable:
 
 > ## 🔁 CAMBIO DE MODELO → Sonnet
+> ```
+> Sonnet 5.5
+> ```
 > Motivo: (una línea)
-
-No mandar el aviso en un mensaje aparte.
